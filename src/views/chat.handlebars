@@ -1,0 +1,19 @@
+<div class="container">
+    <h1>Chat en tiempo real:</h1>
+    <table id="chat-table" class="table"></table>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td><input type="text" id="usuario" placeholder="Nombre de usuario"/></td>
+                <td><input type="text" id="message" placeholder="Mensaje"/></td>
+                <td>
+                    <button type="submit" class="boton" id="btnEnv">Enviar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js" type="module"></script>
