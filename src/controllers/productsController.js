@@ -11,7 +11,7 @@ export default class ProductController {
         // Instancia de ProductService:
         this.productService = new ProductService();
     }
-    
+
     // Métodos para ProductController:
 
     // Crear un producto - Controller:
@@ -19,31 +19,25 @@ export default class ProductController {
         let response = {};
         try {
             const productData = req.body;
-            if (!productData) {
-                response.status = "error";
-                response.message = `No se proporcionó ningún cuerpo para el producto.`;
-                response.statusCode = 400;
-            } else {
-                const responseService = await this.productService.createProductService(productData);
-                response.status = responseService.status;
-                response.message = responseService.message;
-                response.statusCode = responseService.statusCode;
-                if (responseService.status === "success") {
-                    response.result = responseService.result;
-                    // Actualización Real Time: 
-                    const products = await this.productService.getAllProductsService();
-                    req.socketServer.sockets.emit('products', products.result);
-                }
-                if (responseService.status === "error") {
-                    response.error = responseService.error;
-                }
+            const responseService = await this.productService.createProductService(productData);
+            response.status = responseService.status;
+            response.message = responseService.message;
+            response.statusCode = responseService.statusCode;
+            if (responseService.status === "success") {
+                response.result = responseService.result;
+                // Actualización Real Time: 
+                const products = await this.productService.getAllProductsService();
+                req.socketServer.sockets.emit('products', products.result);
             }
-            console.log(response);
+            if (responseService.status === "error") {
+                response.error = responseService.error;
+            }
+            console.log(response.message);
             return response
         } catch (error) {
             console.error('Error:', error.message);
             response.status = "error";
-            response.message = "Error al crear el producto: " + error.message;
+            response.message = "Error al crear el producto - Controller:" + error.message;
             response.error = error.message;
             response.statusCode = 500;
             return response;
@@ -55,32 +49,22 @@ export default class ProductController {
         let response = {};
         try {
             const pid = req.params.pid;
-            if (!pid) {
-                response.status = "error";
-                response.message = `No se proporcionó ningún ID de producto.`;
-                response.statusCode = 400;
-            } else if (!mongoose.Types.ObjectId.isValid(pid)) {
-                response.status = "error";
-                response.message = `El ID proporcionado no es válido.`;
-                response.statusCode = 400;
-            } else {
-                const responseService = await this.productService.getProductByIdService(pid);
-                response.status = responseService.status;
-                response.message = responseService.message;
-                response.statusCode = responseService.statusCode;
-                if (responseService.status === "success") {
-                    response.result = responseService.result;
-                }
-                if (responseService.status === "error") {
-                    response.error = responseService.error;
-                }
+            const responseService = await this.productService.getProductByIdService(pid);
+            response.status = responseService.status;
+            response.message = responseService.message;
+            response.statusCode = responseService.statusCode;
+            if (responseService.status === "success") {
+                response.result = responseService.result;
             }
-            console.log(response);
+            if (responseService.status === "error") {
+                response.error = responseService.error;
+            }
+            console.log(response.message);
             return response
         } catch (error) {
             console.error('Error:', error.message);
             response.status = "error";
-            response.message = "Error al consultar el producto:" + error.message;
+            response.message = "Error al consultar el producto - Controller:" + error.message;
             response.error = error.message;
             response.statusCode = 500;
             return response;
@@ -108,12 +92,12 @@ export default class ProductController {
             if (responseService.status === "error") {
                 response.error = responseService.error;
             };
-            console.log(response);
+            console.log(response.message);
             return response;
         } catch (error) {
             console.error('Error: ', error.message);
             response.status = "error";
-            response.message = "Error al obtener los productos." + error.message;
+            response.message = "Error al obtener los productos - Controller" + error.message;
             response.error = error.message;
             response.statusCode = 500;
             return response;
@@ -125,35 +109,25 @@ export default class ProductController {
         let response = {};
         try {
             const pid = req.params.pid;
-            if (!pid) {
-                response.status = "error";
-                response.message = `No se proporcionó ningún ID de producto.`;
-                response.statusCode = 400;
-            } else if (!mongoose.Types.ObjectId.isValid(pid)) {
-                response.status = "error";
-                response.message = `El ID proporcionado no es válido.`;
-                response.statusCode = 400;
-            } else {
-                const responseService = await this.productService.deleteProductService(pid);
-                response.status = responseService.status;
-                response.message = responseService.message;
-                response.statusCode = responseService.statusCode;
-                if (responseService.status === "success") {
-                    response.result = responseService.result;
-                    // Actualización Real Time: 
-                    const products = await this.productService.getAllProductsService();
-                    req.socketServer.sockets.emit('products', products.result);
-                };
-                if (responseService.status === "error") {
-                    response.error = responseService.error;
-                };
+            const responseService = await this.productService.deleteProductService(pid);
+            response.status = responseService.status;
+            response.message = responseService.message;
+            response.statusCode = responseService.statusCode;
+            if (responseService.status === "success") {
+                response.result = responseService.result;
+                // Actualización Real Time: 
+                const products = await this.productService.getAllProductsService();
+                req.socketServer.sockets.emit('products', products.result);
             };
-            console.log(response);
+            if (responseService.status === "error") {
+                response.error = responseService.error;
+            };
+            console.log(response.message);
             return response
         } catch (error) {
             console.error('Error: ', error.message);
             response.status = "error";
-            response.message = "Error al eliminar el producto" + error.message;
+            response.message = "Error al eliminar el producto - Controller" + error.message;
             response.error = error.message;
             response.statusCode = 500;
             return response;
@@ -166,39 +140,25 @@ export default class ProductController {
         try {
             const pid = req.params.pid;
             const updatedFields = req.body;
-            if (!pid) {
-                response.status = "error";
-                response.message = `No se proporcionó ningún ID de producto.`;
-                response.statusCode = 400;
-            } else if (!mongoose.Types.ObjectId.isValid(pid)) {
-                response.status = "error";
-                response.message = `El ID proporcionado no es válido.`;
-                response.statusCode = 400;
-            } else if (!updatedFields) {
-                response.status = "error";
-                response.message = `No se proporcionó ningún cuerpo para el producto.`;
-                response.statusCode = 400;
-            } else {
-                const responseService = await this.productService.updateProductService(pid, updatedFields);
-                response.status = responseService.status;
-                response.message = responseService.message;
-                response.statusCode = responseService.statusCode;
-                if (responseService.status === "success") {
-                    response.result = responseService.result;
-                    // Actualización Real Time: 
-                    const products = await this.productService.getAllProductsService();
-                    req.socketServer.sockets.emit('products', products.result);
-                }
-                if (responseService.status === "error") {
-                    response.error = responseService.error;
-                }
+            const responseService = await this.productService.updateProductService(pid, updatedFields);
+            response.status = responseService.status;
+            response.message = responseService.message;
+            response.statusCode = responseService.statusCode;
+            if (responseService.status === "success") {
+                response.result = responseService.result;
+                // Actualización Real Time: 
+                const products = await this.productService.getAllProductsService();
+                req.socketServer.sockets.emit('products', products.result);
             }
-            console.log(response);
+            if (responseService.status === "error") {
+                response.error = responseService.error;
+            }
+            console.log(response.message);
             return response
         } catch (error) {
             console.error('Error: ', error.message);
             response.status = "error";
-            response.message = "Error al actualizar el producto:" + error.message;
+            response.message = "Error al actualizar el producto - Controller:" + error.message;
             response.error = error.message;
             response.statusCode = 500;
             return response;

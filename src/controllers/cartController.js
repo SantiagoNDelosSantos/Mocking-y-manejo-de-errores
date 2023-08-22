@@ -1,9 +1,6 @@
 // Import de CartService:
 import CartService from '../services/carts.service.js'
 
-// Import mongoose para validación de IDs:
-import mongoose from 'mongoose';
-
 // Clase para el Controller de carritos:
 export default class CartController {
 

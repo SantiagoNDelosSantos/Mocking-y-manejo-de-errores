@@ -35,9 +35,28 @@ export default class ErrorGenerator {
         return `No se proporcionó ningún cuerpo para actualizar el producto en carrito. Se recibió ${updatedProdInCart}`
     }
 
+    // Productos:
 
+    static generateProductDataErrorInfo(productData) {
+        return `Una o más propiedades en los datos del producto están faltando o no son válidas.
+    Propiedades requeridas:
+    * título: Debe ser un texto no vacío, recibido ${productData.title}.
+    * descripción: Debe ser un texto no vacío, recibido ${productData.description}.
+    * código: Debe ser un texto no vacío, recibido ${productData.code}.
+    * precio: Debe ser un número positivo mayor que 0, recibido ${productData.price}.
+    * stock: Debe ser un número positivo mayor que 0, recibido ${productData.stock}.
+    * categoría: Debe ser un texto no vacío, recibido ${productData.category}.
+    * imágenes: Debe ser un arreglo no vacío de URLs de imágenes, recibido ${productData.thumbnails}.
+    `;
+    }
 
+    static generatePidErrorInfo(pid) {
+        return `La propiedad de ID de producto no tiene un formato válido, se recibió ${pid}.`;
+    }
 
+    static generateEmptyUpdateFieldsErrorInfo(updatedFields) {
+        return `La información del producto es incompleta o incorrecta. Se recibió: ${updatedFields}.`;
+    }
 
 
 

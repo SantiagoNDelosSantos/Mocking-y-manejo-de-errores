@@ -86,6 +86,38 @@ export const errorMiddleware = (error, req, res, next) => {
             });
             break;
 
+            // Productos: 
+
+        case ErrorEnums.INVALID_PRODUCT_DATA:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_PRODUCT_DATA
+            });
+            break;
+
+        case ErrorEnums.INVALID_ID_PRODUCT_ERROR:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_ID_PRODUCT_ERROR
+            });
+            break;
+
+        case ErrorEnums.INVALID_UPDATED_PRODUCT_FIELDS:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_UPDATED_PRODUCT_FIELDS
+            });
+            break;
+
         default:
             res.status(500).send({
                 status: "error",
