@@ -148,7 +148,7 @@ export default class CartService {
 
                 if (productFromDB.result.stock >= quantityToPurchase) {
                     successfulProducts.push(productInfo);
-                    totalAmount += productInfo.price * quantityToPurchase;
+                    totalAmount += productFromDB.result.price * quantityToPurchase;
                     continue;
                 }
 
