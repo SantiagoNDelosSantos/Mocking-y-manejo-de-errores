@@ -100,11 +100,18 @@ export default class CartsDAO {
     async deleteProductFromCart(cid, pid) {
         try {
             const cart = await this.getCartById(cid);
-            cart.products.pull(pid);
-            await cart.save();
-            return {
-                status: 'success'
-            };
+            const product = cart.products.find((p) => p._id.toString() === pid);
+            if (!product) {
+                return {
+                    status: 'error',
+                };
+            } else {
+                cart.products.pull(pid);
+                await cart.save();
+                return {
+                    status: 'success',
+                };
+            }
         } catch (error) {
             throw new Error("Error al borrar el producto en carrito - DAO. Original error: " + error.message);
         }
@@ -132,11 +139,17 @@ export default class CartsDAO {
     async deleteAllProductsFromCart(cid) {
         try {
             const cart = await this.getCartById(cid);
-            cart.products = [];
-            await cart.save();
-            return {
-                status: 'success'
-            };
+            if (cart) {
+                cart.products = [];
+                await cart.save();
+                return {
+                    status: 'success'
+                };
+            } else {
+                return {
+                    status: 'error',
+                };
+            }
         } catch (error) {
             throw new Error("Error al borrar todos los productos en carrito - DAO. Original error: " + error.message);
         }

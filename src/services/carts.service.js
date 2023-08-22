@@ -258,7 +258,7 @@ export default class CartService {
         let response = {};
         try {
             const result = await this.cartDao.deleteProductFromCart(cid, pid);
-            if (result.deletedCount === 0) {
+            if (result.status === "error") {
                 response.status = "error";
                 response.message = `No se encontró ningún producto con el ID ${pid} en el carrito ${cid}`;
                 response.statusCode = 404;
@@ -282,7 +282,7 @@ export default class CartService {
         let response = {};
         try {
             const result = await this.cartDao.deleteAllProductsFromCart(cid);
-            if (result.n === 0) {
+            if (result.status === "error") {
                 response.status = "error";
                 response.message = `No se encontró ningún carrito con el ID ${cid}.`;
                 response.statusCode = 404;
