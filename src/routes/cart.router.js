@@ -19,10 +19,14 @@ import {
     verificarPertenenciaCarrito
 } from "./Middlewares/carts.middleware.js";
 
+// Mongoose para validación de IDs:
+import mongoose from "mongoose";
+
 // Errores:
-import  ErrorEnums from './errors/error.enums.js'
-import { generateQuantityErrorInfo }from "./errors/error.info.js";
+import ErrorEnums from "./errors/error.enums.js";
 import CustomError from "./errors/customError.class.js";
+import ErrorGenerator from "./errors/error.info.js";
+
 
 // Instancia de Router:
 const cartRouter = Router();
@@ -37,7 +41,25 @@ cartRouter.post("/", async (req, res) => {
 });
 
 // Traer un carrito por su ID - Router:
-cartRouter.get("/:cid", async (req, res) => {
+cartRouter.get("/:cid", async (req, res, next) => {
+
+    const cid = req.params.cid;
+
+    // Middleware para validación del ID del carrito: 
+
+    try {
+        if (!cid || !mongoose.Types.ObjectId.isValid(cid)) {
+            CustomError.createError({
+                name: "Invalid ID",
+                cause: ErrorGenerator.generateCidErrorInfo(cid),
+                message: "The provided cart ID is not valid.",
+                code: ErrorEnums.INVALID_ID_CART_ERROR
+            });
+        }
+    } catch (error) {
+        return next(error)
+    }
+
     const result = await cartController.getCartByIdController(req, res);
     res.status(result.statusCode).send(result);
 });
@@ -48,26 +70,35 @@ cartRouter.get('/', async (req, res) => {
     res.status(result.statusCode).send(result);
 });
 
+
+
+
+
 // Agregar un producto a un carrito - Router:
-cartRouter.post('/:cid/products/:pid/quantity/:quantity' ,/*passport.authenticate('jwt', {
-    session: false
-}), rolesMiddlewareUser, verificarPertenenciaCarrito, */async (req, res) => {
+cartRouter.post('/:cid/products/:pid/quantity/:quantity',
+    /*passport.authenticate('jwt', {
+        session: false
+    }), rolesMiddlewareUser, verificarPertenenciaCarrito, */
+    async (req, res, next) => {
 
-    const quantity = req.params.quantity;
+        const quantity = req.params.quantity;
 
-        if (isNaN(quantity) || quantity <= 0) {
-        CustomError.createError({
-            name: "Add product in cart error",
-            cause: generateQuantityErrorInfo(quantity),
-            message: "Quantity must be a valid number",
-            code: ErrorEnums.QUANTITY_INVALID_ERROR
-        });
-    }
-    
+        try {
+            if (isNaN(quantity) || quantity <= 0) {
+                CustomError.createError({
+                    name: "Add product in cart error",
+                    cause: ErrorGenerator.generateQuantityErrorInfo(quantity),
+                    message: "Quantity must be a valid number",
+                    code: ErrorEnums.QUANTITY_INVALID_ERROR
+                });
+            }
+        } catch (error) {
+            return next(error)
+        }
 
-    const result = await cartController.addProductInCartController(req, res);
-    res.status(result.statusCode).send(result);
-});
+        const result = await cartController.addProductInCartController(req, res);
+        res.status(result.statusCode).send(result);
+    });
 
 // Procesamiento de la compra del usuario: 
 cartRouter.post('/:cid/purchase', async (req, res) => {

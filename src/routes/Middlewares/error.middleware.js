@@ -1,16 +1,17 @@
-import ErrorEnums from "./error.enums.js";
+import ErrorEnums from "../errors/error.enums.js";
 
-export default (error, req, res, next) => {
+export const errorMiddleware = (error, req, res, next) => {
     console.log(error.cause);
-    switch (error.cause) {
-        case ErrorEnums.INVALID_TYPES_ERROR:
+    switch (error.code) {
+
+        case ErrorEnums.INVALID_ID_CART_ERROR:
             res.send({
                 status: "error",
-                error: error.name
-            })
+                error: error.name,
+                cause: error.cause,
+            });
             break;
 
-            // Carrito:
         case ErrorEnums.QUANTITY_INVALID_ERROR:
             res.send({
                 status: "error",
@@ -26,3 +27,4 @@ export default (error, req, res, next) => {
             })
     }
 }
+

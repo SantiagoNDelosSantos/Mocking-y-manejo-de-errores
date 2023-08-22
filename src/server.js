@@ -40,7 +40,7 @@ import {
 } from './config.js';
 
 // Importación middleware para errores:
-import errorMiddleware from './routes/errors/error.middleware.js';
+import { errorMiddleware } from './routes/Middlewares/error.middleware.js'
 
 // Iniciamos el servidor Express:
 const app = express();
@@ -60,8 +60,6 @@ app.use(express.static(__dirname + '/public'));
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
-// Middleware Error:
-app.use(errorMiddleware);
 
 // Inicialización de Passport 
 app.use(cookieParser());
@@ -120,7 +118,6 @@ app.use((req, res, next) => {
     next()
 });
 
-
 // Rutas:
 app.use('/api/carts/', cartRouter);
 app.use('/api/chat/', msmRouter);
@@ -129,3 +126,7 @@ app.use('/api/sessions', userRouter);
 app.use('/api/tickets', ticketRouter);
 app.use('/', viewsRouter);
 app.use('/mockProducts', mockRouter);
+
+
+// Middleware Error:
+app.use(errorMiddleware);
