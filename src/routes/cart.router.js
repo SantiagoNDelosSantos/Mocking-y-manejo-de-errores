@@ -120,16 +120,17 @@ cartRouter.post('/:cid/purchase', async (req, res, next) => {
             });
         }
         for (const productInfo of products) {
-            if (!productInfo.databaseProductID || !mongoose.Types.ObjectId.isValid(productInfo.databaseProductID)) {
+            if (!productInfo.databaseProductID || !mongoose.Types.ObjectId.isValid(productInfo.databaseProductID) || !productInfo.cartProductID || !mongoose.Types.ObjectId.isValid(productInfo.cartProductID )) {
                 const error = CustomError.createError({
                     name: "Error al Procesar la Compra de Productos en el Carrito.",
-                    cause: ErrorGenerator.generateProductsPurchaseErrorInfo(productInfo.databaseProductID),
+                    cause: ErrorGenerator.generateProductsPurchaseErrorInfo(productInfo.databaseProductID, productInfo.cartProductID),
                     message: "Uno o más productos tienen un formato inválido.",
                     code: ErrorEnums.INVALID_PRODUCT,
                 });
                 return next(error);
             }
         }
+        
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!userEmail || !emailRegex.test(userEmail)) {
             CustomError.createError({
@@ -187,9 +188,9 @@ cartRouter.delete('/:cid', async (req, res, next) => {
 })
 
 // Actualizar un carrito - Router:
-cartRouter.put('/:cid', /*passport.authenticate('jwt', {
+cartRouter.put('/:cid', passport.authenticate('jwt', {
     session: false
-}), rolesMiddlewareUser, verificarPertenenciaCarrito, */async (req, res, next) => {
+}), rolesMiddlewareUser, verificarPertenenciaCarrito, async (req, res, next) => {
     try {
         const cid = req.params.cid;
         const updatedCartFields = req.body;

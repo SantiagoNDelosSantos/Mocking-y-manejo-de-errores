@@ -19,8 +19,8 @@ export default class ErrorGenerator {
         return `Una o más propiedades en la información de compra están incompletas o no son válidas. Por favor, proporciona información de compra válida. Se recibió ${purchaseInfo}`;
     }
 
-    static generateProductsPurchaseErrorInfo(databaseProductID) {
-        return `Uno o más productos tienen un formato inválido. Se recibió ${databaseProductID}`;
+    static generateProductsPurchaseErrorInfo(databaseProductID, cartProductID) {
+        return `Uno o más productos tienen un formato inválido. Se recibió ${databaseProductID} como ID en producto en base de datos y ${cartProductID} como ID de producto en carrito.`;
     }
 
     static generateEmailUserErrorInfo(userEmail) {

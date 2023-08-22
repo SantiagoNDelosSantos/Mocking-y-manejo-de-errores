@@ -63,7 +63,7 @@ function updateTable() {
           <input type="number" class="input-quantity" data-product-id="${idProd}" value="${quantity}" min="1" max="${stock}">
         </td>
         <td>$${price}</td>
-        <td class="subtotal">$${subtotal.toFixed(2)}</td>
+        <td class="subtotal">$${subtotal}</td>
         <td><h2 class="boton" data-product-id="${idProd}">Eliminar</h2></td>
       </tr>`;
 
