@@ -2,14 +2,10 @@
 import mongoose from "mongoose";
 
 // Import del modelo de productos:
-import {
-    productsModel
-} from "./models/products.model.js";
+import { productsModel } from "./models/products.model.js";
 
 // Importación de variables de entorno:
-import {
-    envMongoURL
-} from "../../config.js";
+import { envMongoURL } from "../../config.js";
 
 // Clase para el DAO de productos:
 export default class ProductsDAO {
@@ -19,28 +15,37 @@ export default class ProductsDAO {
 
     // Crear producto - DAO:
     async createProduct(info) {
+        let response = {};
         try {
             const result = await productsModel.create(info);
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al crear el producto - DAO. Error original: " + error.message);
-        }
+            response.status = "error";
+            response.message = "Error al crear el producto - DAO: " + error.message;
+        };
+        return response;
     };
 
     // Traer un producto por su ID - DAO:
     async getProductById(pid) {
+        let response = {};
         try {
             const result = await productsModel.findOne({
                 _id: pid
             });
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al obtener el producto por ID - DAO. Error original: " + error.message);
+            response.status = "error";
+            response.message = "Error al obtener el producto por ID - DAO: " + error.message;
         };
+        return response;
     };
 
     // Traer todos los productos - DAO:
     async getAllProducts(limit = 10, page = 1, sort = 1, filtro = null, filtroVal = null) {
+        let response = {};
         try {
             let whereOptions = {};
             if (filtro != '' && filtroVal != '') {
@@ -64,37 +69,50 @@ export default class ProductsDAO {
                 });
             }
             const hasNextPage = result.page < result.totalPages;
-            return {
+            response.status = "success";
+            response.result = {
                 products: result,
                 hasNextPage: hasNextPage
             };
         } catch (error) {
-            throw new Error("Error al obtener los productos - DAO. Error original: " + error.message);
-        }
+            response.status = "error";
+            response.message = "Error al obtener los productos - DAO: " + error.message;
+        };
+        return response;
     };
-
+    
     // Eliminar un producto por su ID - DAO:
     async deleteProduct(pid) {
+        let response = {};
         try {
-            let result = await productsModel.deleteOne({ _id: pid })
-            return result;
+            let result = await productsModel.deleteOne({
+                _id: pid
+            })
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al eliminar el producto - DAO. Error original: " + error.message);
-        }
+            response.status = "error";
+            response.message = "Error al eliminar el producto - DAO: " + error.message;
+        };
+        return response;
     };
 
     // Actualizar un producto - DAO:
     async updateProduct(pid, updateProduct) {
+        let response = {};
         try {
             let result = await productsModel.updateOne({
                 _id: pid
             }, {
                 $set: updateProduct
             });
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al actualizar el producto. Error original: " + error.message);
-        }
+            response.status = "error";
+            response.message = "Error al actualizar el producto - DAO: " + error.message;
+        };
+        return response;
     };
 
-}
+};

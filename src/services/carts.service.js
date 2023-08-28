@@ -23,16 +23,19 @@ export default class CartService {
     async createCartService() {
         let response = {};
         try {
-            const result = await this.cartDao.createCart();
-            response.status = "success";
-            response.message = "Carrito creado exitosamente.";
-            response.result = result;
-            response.statusCode = 200;
+            const resultDAO = await this.cartDao.createCart();
+            if (resultDAO.status === "success") {
+                response.statusCode = 200;
+                response.message = "Carrito creado exitosamente.";
+                response.result = resultDAO.result;
+            }
+            if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
+            }
         } catch (error) {
-            response.status = "error";
-            response.message = "No se pudo crear el carrito.";
-            response.error = error.message;
             response.statusCode = 500;
+            response.message = "Error al crear el carrito - Service: " + error.message;
         }
         return response;
     }
@@ -41,22 +44,21 @@ export default class CartService {
     async getCartByIdService(cid) {
         let response = {};
         try {
-            const result = await this.cartDao.getCartById(cid);
-            if (!result) {
-                response.status = "error";
-                response.message = `El carrito con ID ${cid}, no se ha encontrado.`;
+            const resultDAO = await this.cartDao.getCartById(cid);
+            if (resultDAO.result === null) {
                 response.statusCode = 404;
-            } else {
-                response.status = "success";
-                response.message = "Carrito obtenido exitosamente.";
-                response.result = result;
+                response.message = `No se encontro ningún carrito con ID ${cid}.`;
+            } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
+                response.message = "Carrito obtenido exitosamente.";
+                response.result = resultDAO.result;
+            } else if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
             }
         } catch (error) {
-            response.status = "error";
-            response.message = "No se pudo obtener el carrito.";
-            response.error = error.message;
             response.statusCode = 500;
+            response.message = "Error al obtener el carrito por ID - Service: " + error.message;
         }
         return response;
     }
@@ -65,22 +67,21 @@ export default class CartService {
     async getAllCartsService() {
         let response = {};
         try {
-            const result = await this.cartDao.getAllCarts();
-            if (!result) {
-                response.status = "error";
-                response.message = "Carritos no encontrados.";
+            const resultDAO = await this.cartDao.getAllCarts();
+            if (resultDAO.result.length === 0) {
                 response.statusCode = 404;
-            } else {
-                response.status = "success";
-                response.message = "Carritos obtenidos exitosamente.";
-                response.result = result;
+                response.message = "No se han encontrado carritos.";
+            } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
+                response.message = "Carritos obtenidos exitosamente.";
+                response.result = resultDAO.result;
+            } else if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
             }
         } catch (error) {
-            response.status = "error";
-            response.message = "No se pudo obtener los carritos.";
-            response.error = error.message;
             response.statusCode = 500;
+            response.message = "Error al obtener los carritos - Service: " + error.message;
         }
         return response;
     }
@@ -89,33 +90,50 @@ export default class CartService {
     async addProductToCartService(cid, pid, quantity) {
         let response = {}
         try {
-            const product = await this.productService.getProductByIdService(pid)
-            if (!product) {
-                response.status = "error";
-                response.message = `No se pudo obtener el producto con ID ${pid}.`;
-                response.statusCode = 404;
-            } else {
-                const soloProduct = product.result
-                const result = await this.cartDao.addProductToCart(cid, soloProduct, quantity);
-                if (!result) {
-                    response.status = "error";
-                    response.message = "No fue posible agregar el producto al carrito.";
+            const cart = await this.getCartByIdService(cid);
+            const product = await this.productService.getProductByIdService(pid);
+            if (cart.statusCode === 404 || cart.statusCode === 500) {
+                response.statusCode = cart.statusCode;
+                response.message = cart.message;
+            } else if (product.statusCode === 404 || product.statusCode === 500) {
+                response.statusCode = product.statusCode;
+                response.message = product.message;
+            } else if (cart.statusCode === 200 && product.statusCode === 200) {
+                const soloCart = cart.result;
+                const resultDAO = await this.cartDao.addProductToCart(soloCart, product.result, quantity);
+                if (resultDAO.result === null) {
                     response.statusCode = 400;
-                } else {
-                    response.status = "success";
-                    response.message = "Producto agregado al carrito exitosamente.";
-                    response.result = result;
+                    response.message = `No fue posible agregar el producto ${pid}, al carrito ${cid}.`;
+                } else if (resultDAO.status === "success") {
                     response.statusCode = 200;
+                    response.message = "Producto agregado al carrito exitosamente.";
+                    response.result = resultDAO.result;
+                } else if (resultDAO.status === "error") {
+                    response.statusCode = 500;
+                    response.message = resultDAO.message;
                 }
             }
         } catch (error) {
-            response.status = "error";
-            response.message = "No se pudo agregar el producto al carrito.";
-            response.error = error.message;
             response.statusCode = 500;
+            response.message = "Error al agregar el producto al carrito - Service: " + error.message;
         }
         return response;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Procesamiento de la compra del usuario:
     async purchaseProductsInCartService(cartID, purchaseInfo, userEmail) {
@@ -124,7 +142,7 @@ export default class CartService {
         try {
             const successfulProducts = [];
             const failedProducts = [];
-            let totalAmount = 0; 
+            let totalAmount = 0;
 
             for (const productInfo of purchaseInfo.products) {
 
@@ -177,15 +195,15 @@ export default class CartService {
             // Crear el ticket con todos los productos de la compra después de verificar y actualizar el stock
             const ticketInfo = {
                 successfulProducts: successfulProducts.map(productInfo => ({
-                    product: productInfo.databaseProductID, 
-                    quantity: productInfo.quantity, 
-                    title: productInfo.title, 
+                    product: productInfo.databaseProductID,
+                    quantity: productInfo.quantity,
+                    title: productInfo.title,
                     price: productInfo.price,
                 })),
                 failedProducts: failedProducts.map(productInfo => ({
                     product: productInfo.databaseProductID,
                     quantity: productInfo.quantity,
-                    title: productInfo.title, 
+                    title: productInfo.title,
                     price: productInfo.price,
                 })),
                 purchase: userEmail,
@@ -228,6 +246,13 @@ export default class CartService {
         }
     }
 
+
+
+
+
+
+
+    
     // Agregar un ticket a un carrito - Service:
 
     async addTicketToCartService(cartID, ticketID) {
@@ -276,6 +301,16 @@ export default class CartService {
         }
         return response
     }
+
+
+
+
+
+
+
+
+
+    
 
     // Eliminar todos los productos de un carrito - Service: 
     async deleteAllProductFromCartService(cid) {

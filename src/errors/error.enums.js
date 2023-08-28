@@ -35,6 +35,18 @@ const ErrorEnums = {
 
     INVALID_UPDATED_PRODUCT_FIELDS: 11,
 
+    // Mensajes:
+
+    INVALID_MESSAGE_DATA: 12,
+
+    INVALID_ID_MESSAGE_ERROR: 13,
+
+    // Ticket:
+
+    INVALID_TICKET_DATA: 14,
+
+    INVALID_ID_TICKET_ERROR: 15,
+
 }
 
 export default ErrorEnums;

@@ -1,7 +1,9 @@
-import ErrorEnums from "../errors/error.enums.js";
+import ErrorEnums from "./error.enums.js";
 
 export const errorMiddleware = (error, req, res, next) => {
-    console.log(error.cause);
+    
+    req.logger.warn(error.cause);
+
     switch (error.code) {
 
         // Carrito: 
@@ -115,6 +117,50 @@ export const errorMiddleware = (error, req, res, next) => {
                 cause: error.cause,
                 message: error.message,
                 code: ErrorEnums.INVALID_UPDATED_PRODUCT_FIELDS
+            });
+            break;
+
+            // Mensajes: 
+
+            case ErrorEnums.INVALID_MESSAGE_DATA:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_MESSAGE_DATA
+            });
+            break;
+
+            case ErrorEnums.INVALID_ID_MESSAGE_ERROR:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_ID_MESSAGE_ERROR
+            });
+            break;
+
+            // Ticket:
+
+            case ErrorEnums.INVALID_TICKET_DATA:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_TICKET_DATA
+            });
+            break;
+
+            case ErrorEnums.INVALID_ID_TICKET_ERROR:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_ID_TICKET_ERROR
             });
             break;
 

@@ -15,66 +15,75 @@ export default class MessageService {
     async createMessageService(message) {
         let response = {};
         try {
-            const result = await this.messageDao.createMessage(message);
-            response.status = "success";
-            response.message = "Mensaje creado exitosamente.";
-            response.result = result;
-            response.statusCode = 201;
+            const resultDAO = await this.messageDao.createMessage(message);
+            if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
+            } else if (resultDAO.result === null) {
+                response.statusCode = 500;
+                response.message = "Error al crear el mensaje - Service: resultDao.result es null.";
+            } else if (resultDAO.status === "success") {
+                response.statusCode = 200;
+                response.message = "Mensaje creado exitosamente.";
+                response.result = resultDAO.result;
+            };
         } catch (error) {
-            response.status = "error";
-            response.message = "Error al crear el producto.";
-            response.error = error.message;
             response.statusCode = 500;
-        }
+            response.message = "Error al crear el producto - Service: " + error.message;
+        };
         return response;
-    }
-
+    };
+    
     // Traer todos los mensajes - Service: 
     async getAllMessageService() {
         let response = {};
         try {
-            const result = await this.messageDao.getAllMessage();
-            if (result.length === 0) {
-                response.status = "error";
-                response.message = "No se encontraron mensajes.";
-                response.statusCode = 404;
-            } else {
-                response.status = "success";
-                response.message = "Mensajes obtenidos exitosamente.";
-                response.result = result;
+            const resultDAO = await this.messageDao.getAllMessage();
+            if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
+            } else if (resultDAO.result === null) {
+                response.statusCode = 500;
+                response.message = "Error al obtener los mensajes - Service: resultDao.result es null.";
+            } else if (resultDAO.result.length === 0) {
+                 response.statusCode = 404;
+                response.message = `No se encontraron mensajes. El resultado fue de ${resultDAO.result.length} mensajes`;
+            } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
-            }
+                response.message = "Mensajes obtenidos exitosamente.";
+                response.result = resultDAO.result;
+            };
         } catch (error) {
-            response.status = "error";
-            response.message = "Error al obtener los mensajes.";
-            response.error = error.message;
             response.statusCode = 500;
-        }
+            response.message = "Error al obtener los mensajes - Service: " + error.message;
+        };
         return response;
-    }
+    };
 
     // Borrar un mensaje - DAO:
-    async deleteMessageService(mid){
+    async deleteMessageService(mid) {
         let response = {};
         try {
-            const result = await this.messageDao.deleteMessage(mid);
-            if (result.deletedCount === 0) {
-                response.status = "error";
-                response.message =  `No se encontró ningún mensaje con el ID ${mid}.`;
+            const resultDAO = await this.messageDao.deleteMessage(mid);
+            if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
+            } else if (resultDAO.result === null) {
+                response.statusCode = 500;
+                response.message = "Error al eliminar el mensaje - Service: resultDao.result es null.";
+            } else if (resultDAO.result.deletedCount === 0) {
                 response.statusCode = 404;
-            } else {
-                response.status = "success";
-                response.message = "Mensaje eliminado exitosamente.";
-                response.result = result;
+                response.message = `No se encontró ningún mensaje con el ID ${mid}.`;
+            } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
-            }
+                response.message = "Mensaje eliminado exitosamente.";
+                response.result = resultDAO.result;
+            };
         } catch (error) {
-            response.status = "error";
-            response.message = "Error al eliminar el mensaje.";
-            response.error = error.message;
             response.statusCode = 500;
-        }
+            response.message = "Error al eliminar el mensaje - Service: " + error.message;
+        };
         return response;
-    }
+    };
 
-}
+};

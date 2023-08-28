@@ -19,34 +19,44 @@ export default class MessageDAO {
 
     // Crear un mensaje - DAO:
     async createMessage(message) {
+        let response = {};
         try {
             const result = await messageModel.create(message);
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al crear el mensaje - DAO. Error original: " + error.message);
-        }
-    }
+            response.status = "error";
+            response.message = "Error al crear el mensaje - DAO: " + error.message;
+        };
+        return response;
+    };
 
     // Traer todos los mensajes - DAO: 
     async getAllMessage() {
+        let response = {};
         try {
             let result = await messageModel.find().lean();
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al obtener los mensajes - DAO. Error original: " + error.message);
-        }
-    }
+            response.status = "error";
+            response.message = "Error al obtener los mensajes - DAO: " + error.message;
+        };
+        return response;
+    };
 
     // Borrar un mensaje - DAO:
     async deleteMessage(mid) {
+        let response = {};
         try {
-            let result = await messageModel.deleteOne({
-                _id: mid
-            })
-            return result;
+            let result = await messageModel.deleteOne({ _id: mid });
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al eliminar el mensaje - DAO. Error original: " + error.message);
-        }
-    }
+            response.status = "error";
+            response.message = "Error al eliminar el mensaje - DAO: " + error.message;
+        };
+        return response;
+    };
 
-}
+};

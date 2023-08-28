@@ -15,6 +15,9 @@ dotenv.config({
 
 // Exporto las variables de entorno: 
 
+// Entorno: 
+export const envEntorno = process.env.ENVIRONMENT;
+
 // MongoDB
 export const envMongoURL = process.env.MONGO_URL;
 export const envPort = process.env.PORT;

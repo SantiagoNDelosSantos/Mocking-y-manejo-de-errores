@@ -22,43 +22,55 @@ export default class CartsDAO {
 
     // Crear un carrito - DAO:
     async createCart() {
+        let response = {};
         try {
             const result = await cartModel.create({
                 products: [],
                 tickets: []
             });
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al crear el carrito - DAO. Error original: " + error.message);
-        };
-    };
+            response.status = "error";
+            response.message = "Error al crear el carrito - DAO: " + error.message;
+        }
+        return response;
+    }
 
     // Traer un carrito por su ID - DAO:
     async getCartById(cid) {
+        let response = {};
         try {
             const result = await cartModel.findOne({
                 _id: cid
             }).populate(['products.product', 'tickets.ticketsRef']);
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al obtener el carrito por ID - DAO. Error original: " + error.message);
-        };
-    };
+            response.status = "error";
+            response.message = "Error al obtener el carrito por ID - DAO: " + error.message;
+        }
+        return response;
+    }
 
     // Traer todos los carritos - DAO: 
     async getAllCarts() {
+        let response = {};
         try {
             const result = await cartModel.find();
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al obtener todos los carritos - DAO. Error original: " + error.message);
-        };
-    };
+            response.status = "error";
+            response.message = "Error al obtener todos los carritos - DAO: " + error.message;
+        }
+        return response;
+    }
 
     // Agregar un producto a un carrito:
-    async addProductToCart(cid, product, quantity) {
+    async addProductToCart(cart, product, quantity) {
+        let response = {};
         try {
-            const cart = await this.getCartById(cid);
             const productID = product._id.toString();
             const existingProductIndex = cart.products.findIndex(p => p.product._id.toString() === productID);
             if (existingProductIndex !== -1) {
@@ -72,11 +84,15 @@ export default class CartsDAO {
                 });
             }
             await cart.save();
-            return cart;
+            response.status = "success";
+            response.result = cart;
         } catch (error) {
-            throw new Error("Error al agregar el producto al carrito - DAO. Original error: " + error.message);
+            response.status = "error";
+            response.message = "Error al agregar el producto al carrito - DAO: " + error.message;
         }
+        return response;
     }
+
 
     // Agregar un ticket a un carrito - DAO:
     async addTicketToCart(cid, ticketID) {
@@ -95,6 +111,7 @@ export default class CartsDAO {
             throw new Error("Error al agregar el ticket al carrito - DAO. Original error: " + error.message);
         }
     }
+
 
     // Borrar un producto de un carrito: 
     async deleteProductFromCart(cid, pid) {
@@ -117,6 +134,24 @@ export default class CartsDAO {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     // Actualizar la cantidad de un produco en carrito - DAO: 
     async updateProductInCart(cid, pid, updatedProdInCart) {
         try {

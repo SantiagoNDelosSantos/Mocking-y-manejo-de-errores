@@ -4,7 +4,7 @@ import express, {
 } from 'express';
 import mongoose from 'mongoose';
 import handlebars from "express-handlebars";
-import __dirname from './utils.js';
+import __dirname from './utils/dirname.utils.js';
 import {
     Server
 } from 'socket.io';
@@ -17,6 +17,8 @@ import userRouter from './routes/session.router.js'
 import viewsRouter from "./routes/views.router.js";
 import ticketRouter from "./routes/ticket.router.js";
 import mockRouter from './routes/mock.router.js'
+import loggerRouter from './routes/loggerTest.router.js'
+
 // Importación de controladores: 
 import ViewsController from './controllers/viewsController.js';
 
@@ -40,7 +42,10 @@ import {
 } from './config.js';
 
 // Importación middleware para errores:
-import { errorMiddleware } from './routes/Middlewares/error.middleware.js'
+import { errorMiddleware } from './errors/error.middleware.js'
+
+// Imporación logs:
+import { addLogger } from './logs/logger.config.js';
 
 // Iniciamos el servidor Express:
 const app = express();
@@ -57,6 +62,7 @@ app.use(urlencoded({
     extended: true
 }));
 app.use(express.static(__dirname + '/public'));
+app.use(addLogger);
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
@@ -126,7 +132,7 @@ app.use('/api/sessions', userRouter);
 app.use('/api/tickets', ticketRouter);
 app.use('/', viewsRouter);
 app.use('/mockProducts', mockRouter);
-
+app.use('/loggerTest', loggerRouter);
 
 // Middleware Error:
 app.use(errorMiddleware);

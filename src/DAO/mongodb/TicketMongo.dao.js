@@ -5,9 +5,7 @@ import mongoose from "mongoose";
 import { ticketModel } from './models/ticket.model.js'
 
 // Importación de variables de entorno: 
-import {
-    envMongoURL
-} from "../../config.js";
+import { envMongoURL } from "../../config.js";
 
 // Clase para el DAO de tickets:
 export default class TicketDAO {
@@ -15,26 +13,34 @@ export default class TicketDAO {
     // Conexión Mongoose:
     connection = mongoose.connect(envMongoURL);
 
-    // Crear colección de tickets - DAO: 
+    // Crear ticket - DAO: 
     async createTicket(ticketInfo) {
+        let response = {}
         try {
             const result = await ticketModel.create(ticketInfo);
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("No se pudo crear el ticket para el usuario - DAO. Error original: " + error.message);
-        }
-    }
+            response.status = "error";
+            response.message = "No se pudo crear el ticket - DAO. Error original: " + error.message;
+        };
+        return response;
+    };
 
     // Obtener ticket por id de un usuario - DAO:
-    async getTicketsByID(tid) {
+    async getTicketByID(tid) {
+        let response = {}
         try {
             const result = await ticketModel.findOne({
                 _id: tid
-            }).populate('tickets.ticket');
-            return result;
+            });
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("No se pudieron obtener los tickets del usuario - DAO. Error original: " + error.message);
-        }
-    }
-
-}
+            response.status = "error";
+            response.message = "Error al obtener el ticket por ID - DAO: " + error.message;
+        };
+        return response;
+    };
+    
+};

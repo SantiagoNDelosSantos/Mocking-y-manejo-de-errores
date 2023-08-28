@@ -11,46 +11,50 @@ export default class TicketService {
 
     // Métodos del TicketService: 
 
-    // Crear colección de tickets - Service:
+    // Crear ticket - Service:
     async createTicketService(ticketInfo) {
         let response = {};
         try {
-            const result = await this.ticketDao.createTicket(ticketInfo);
-            response.status = "success";
-            response.message = "Se ha creado la colección de tickets exitosamente.";
-            response.result = result;
-            response.statusCode = 200;
+            const resultDAO = await this.ticketDao.createTicket(ticketInfo);
+            if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
+            } else if (resultDAO.result === null) {
+                response.statusCode = 500;
+                response.message = "Error al crear el ticket - Service: resultDao.result es null.";
+            } else if (resultDAO.status === "success"){
+                response.statusCode = 200;
+                response.message = "Ticket creado exitosamente.";
+                response.result = resultDAO.result;
+            };
         } catch (error) {
-            response.status = "error";
-            response.message = "No se pudo crear la colección de tickets.";
-            response.error = error.message;
-            response.statusCode = 500;
-        }
+             response.statusCode = 500;
+            response.message = "No se pudo crear el ticket - Service: " + error.message;
+        };
         return response;
-    }
+    };
 
     // Obtener todos los tickets de un usuario - Service:
-    async getTicketsByIdService(tid) {
+    async getTicketByIdService(tid) {
         let response = {};
         try {
-            const result = await this.ticketDao.getTicketsByID(tid);
-            if (!result) {
-                response.status = "error";
-                response.message = `No se pudo encontrar la colección de tickets con ID ${tid}.`;
+            const resultDAO = await this.ticketDao.getTicketByID(tid);
+            if (resultDAO.status === "error") {
+                response.statusCode = 500;
+                response.message = resultDAO.message;
+            } else if (resultDAO.result === null) {
                 response.statusCode = 404;
-            } else {
-                response.status = "success";
-                response.message = "Se han obtenido los tickets del usuario exitosamente.";
-                response.result = result;
+                response.message = `No se encontro ningún ticket con el ID ${tid}.`;
+            } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
-            }
+                response.message = "Ticket obtenido exitosamente.";
+                response.result = resultDAO.result;
+            };
         } catch (error) {
-            response.status = "error";
-            response.message = "No se pudo obtener la colección de tickets - Service.";
-            response.error = error.message;
             response.statusCode = 500;
-        }
+            response.message = "Error al obtener el ticket por ID - Service: " + error.message;
+        };
         return response;
-    }
+    };
 
-}
+};

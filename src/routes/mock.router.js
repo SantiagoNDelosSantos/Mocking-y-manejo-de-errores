@@ -5,7 +5,7 @@ import { Router } from "express";
 const mockRouter = Router();
 
 // Import función de generateProducts:
-import { generateProduct } from "../utils/mock.utils.js";
+import { generateProduct } from "../mocks/mock.config.js";
 
 // Traer un 100 productos - Router:
 mockRouter.get("/", async (req, res) => {
