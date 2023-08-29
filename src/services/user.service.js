@@ -35,6 +35,7 @@ export default class UserService {
         let response = {};
         try {
             const result = await this.userDAO.getUserByEmailOrNameOrId(identifier);
+            
             if (!result) {
                 response.status = "error";
                 response.message = `No se encontró ningún usuario con el Email, Nombre o ID proporcionado - Service.`;

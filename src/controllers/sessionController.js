@@ -1,35 +1,98 @@
+// Import jwt, passport y variables de jwt:
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
-import {
-    envCoderSecret,
-    envCoderCookie
-} from '../config.js';
+import { envCoderSecret, envCoderCookie, envCoderUserIDCookie } from '../config.js';
 
 // Imports DTOs: 
-import {
-    CurrentUserDTO
-} from './DTO/user.dto.js';
+import { CurrentUserDTO } from './DTO/user.dto.js';
 
-export const registerUser = (req, res, next) => {
-    passport.authenticate('register', {
-        session: false
-    }, (err, user, info) => {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.status(401).json({
-                message: info.message
+
+// Import de SessionService: 
+import SessionService from '../services/user.service.js'
+
+
+// Clase para el Controller de session: 
+
+export default class SessionController{
+
+    constructor(){
+        // Instancia de SessionService: 
+        this.sessionService = new SessionService();
+    }
+
+    // Métodos para SessionController: 
+
+    // Register - Controller: 
+
+    async registerUserController(req, res, next) {
+
+        console.log(req.body)
+    
+        passport.authenticate('register', {
+            session: false
+        }, (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!user) {
+                return res.status(401).json({
+                    message: info.message
+                });
+            }
+            res.json({
+                message: 'Registro exitoso',
+                user
             });
-        }
-        res.json({
-            message: 'Registro exitoso',
-            user
-        });
-    })(req, res, next);
-};
+        })(req, res, next);
+
+
+        
+    };
+    
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const loginUser = (req, res, next) => {
+
+
+
+
     passport.authenticate('login', {
         session: false
     }, (err, user, info) => {
@@ -44,7 +107,6 @@ export const loginUser = (req, res, next) => {
             let token = jwt.sign({
                 email: user.email,
                 first_name: user.first_name,
-                tickets: user.tickets,
                 role: user.role,
                 cart: user.cart,
                 userID: user._id
@@ -64,7 +126,14 @@ export const getCurrentUser = (req, res) => {
     res.send(new CurrentUserDTO(req.user));
 };
 
+
+
+
+
 export const authenticateWithGitHub = (req, res, next) => {
+
+
+
     passport.authenticate('github', {
         session: false
     }, (err, user, info) => {
@@ -74,7 +143,7 @@ export const authenticateWithGitHub = (req, res, next) => {
         }
         if (user.password === "Sin contraseña.") {
             // Crear una cookie con el ID del usuario
-            res.cookie('userId', user._id, {
+            res.cookie(envCoderUserIDCookie, user._id, {
                 httpOnly: true,
                 maxAge: 1 * 60 * 1000
             }).redirect('/completeProfile');
@@ -84,7 +153,14 @@ export const authenticateWithGitHub = (req, res, next) => {
     })(req, res, next);
 };
 
+
+
+
+
+
 export const getProfileUser = async (req, res) => {
+
+
 
     const user = new CurrentUserDTO(req.user);
 
