@@ -30,6 +30,7 @@ export const envCallbackURL = process.env.CALLBACK_URL;
 // JWT:
 export const envCoderSecret = process.env.CODER_SECRET;
 export const envCoderCookie = process.env.CODER_COOKIE;
+export const envCoderUserIDCookie = process.env.CODER_USER;
 
 // ADMIN:
 export const envAdminCoder = process.env.ADMIN_EMAIL;

@@ -6,7 +6,7 @@ import local from 'passport-local';
 import {
     createHash,
     isValidPassword
-} from "../utils/bcrypt.utils.js";
+} from "../utils.js";
 
 // Import UserController:
 import UserController from '../controllers/userController.js'

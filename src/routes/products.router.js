@@ -25,7 +25,8 @@ productsRouter.post('/', passport.authenticate('jwt', { session: false }), roles
 });
 
 // Traer un producto por su ID - Router: 
-productsRouter.get('/:pid', async (req, res, next) => { const result = await productController.getProductByIDController(req, res, next);
+productsRouter.get('/:pid', async (req, res, next) => { 
+    const result = await productController.getProductByIDController(req, res, next);
     if (result !== undefined) {
         res.status(result.statusCode).send(result);
     };

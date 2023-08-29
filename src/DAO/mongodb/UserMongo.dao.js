@@ -20,7 +20,9 @@ export default class UserDAO {
     // Crear usuario - DAO: 
     async createUser(info) {
         try {
+            console.log(info)
             const result = await userModel.create(info);
+            console.log(result)
             return result;
         } catch (error) {
             throw new Error("Error al registrar el usurio - DAO. Error original: " + error.message);
@@ -30,6 +32,8 @@ export default class UserDAO {
     // Buscar usuario por email, nombre de usuario o id - DAO:
     async getUserByEmailOrNameOrId(identifier) {
         try {
+
+            console.log(identifier)
             const conditions = [{
                     email: identifier
                 },
@@ -47,6 +51,7 @@ export default class UserDAO {
                 $or: conditions
             });
 
+            console.log(result)
             return result;
         } catch (error) {
             throw new Error("Error al obtener el usuario por Email, Nombre o ID - DAO. Error original: " + error.message);

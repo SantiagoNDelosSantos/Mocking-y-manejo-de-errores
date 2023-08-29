@@ -4,7 +4,7 @@ import express, {
 } from 'express';
 import mongoose from 'mongoose';
 import handlebars from "express-handlebars";
-import __dirname from './utils/dirname.utils.js';
+import __dirname from './utils.js';
 import {
     Server
 } from 'socket.io';

@@ -16,6 +16,7 @@ export default class TicketDAO {
     // Crear ticket - DAO: 
     async createTicket(ticketInfo) {
         let response = {}
+        console.log(ticketInfo)
         try {
             const result = await ticketModel.create(ticketInfo);
             response.status = "success";

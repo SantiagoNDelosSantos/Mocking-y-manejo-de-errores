@@ -167,7 +167,8 @@ export const errorMiddleware = (error, req, res, next) => {
         default:
             res.status(500).send({
                 status: "error",
-                error: "Unhandled error"
+                error: "Unhandled error",
+                cause: error.message
             });
     }
 };
