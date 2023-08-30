@@ -47,6 +47,12 @@ const ErrorEnums = {
 
     INVALID_ID_TICKET_ERROR: 15,
 
+    // Session: 
+
+    INVALID_REGISTER_DATA: 16,
+
+    INVALID_LOGIN_DATA: 17, 
+
 }
 
 export default ErrorEnums;

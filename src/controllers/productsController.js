@@ -37,7 +37,6 @@ export default class ProductController {
         };
         let response = {};
         try {
-            const productData = req.body;
             const resultService = await this.productService.createProductService(productData);
             response.statusCode = resultService.statusCode;
             response.message = resultService.message;

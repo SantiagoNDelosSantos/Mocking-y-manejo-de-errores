@@ -101,11 +101,7 @@ export default class ProductsDAO {
     async updateProduct(pid, updateProduct) {
         let response = {};
         try {
-            let result = await productsModel.updateOne({
-                _id: pid
-            }, {
-                $set: updateProduct
-            });
+            let result = await productsModel.updateOne({  _id: pid }, { $set: updateProduct });
             response.status = "success";
             response.result = result;
         } catch (error) {

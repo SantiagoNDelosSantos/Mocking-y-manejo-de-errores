@@ -35,26 +35,17 @@ export default class ViewsController {
             let filtro = filtroV || null;
             let filtroVal = filtroValV || null;
 
-            const responseService = await this.productService.getAllProductsService(limit, page, sort, filtro, filtroVal)
-            response.status = responseService.status;
-            response.message = responseService.message;
-            response.statusCode = responseService.statusCode;
-            if (responseService.status === "success") {
-                response.result = responseService.result;
-                response.hasNextPage = responseService.hasNextPage;
+            const resultService = await this.productService.getAllProductsService(limit, page, sort, filtro, filtroVal);
+            response.statusCode = resultService.statusCode;
+            if (resultService.statusCode === 200) {
+                response.result = resultService.result;
+                response.hasNextPage = resultService.hasNextPage;
             };
-            if (responseService.status === "error") {
-                response.error = responseService.error;
-            };
-            return response;
         } catch (error) {
-            console.error('Error: ', error.message);
-            response.status = "error";
-            response.message = "Error al obtener los productos." + error.message;
-            response.error = error.message;
             response.statusCode = 500;
-            return response;
+            response.message = "Error al obtener los productos - Controller: " + error.message;
         };
+        return response;
     };
 
     // CHAT - VISTA: 
@@ -63,24 +54,17 @@ export default class ViewsController {
     async getAllMessageControllerV() {
         let response = {};
         try {
-            const responseService = await this.messageService.getAllMessageService();
-            response.status = responseService.status;
-            response.message = responseService.message;
-            response.statusCode = responseService.statusCode;
-            if (responseService.status === "success") {
-                response.result = responseService.result;
-                response.hasNextPage = responseService.hasNextPage;
+            const resultService = await this.messageService.getAllMessageService();
+            response.statusCode = resultService.statusCode;
+            response.message = resultService.message;
+            if (resultService.statusCode === 200) {
+                response.result = resultService.result;
             };
-            if (responseService.status === "error") {
-                response.error = responseService.error;
-            };
-            return response;
-        } catch {
-            console.error('Error:', error.message);
-            res.status(500).json({
-                error: "Error al obtener los mensajes: " + error.message
-            });
-        }
-    }
+        } catch (error) {
+            response.statusCode = 500;
+            response.message = "Error al obtener los mensajes - Controller: " + error.message;
+        };
+        return response;
+    };
 
 };

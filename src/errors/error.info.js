@@ -39,15 +39,15 @@ export default class ErrorGenerator {
 
     static generateProductDataErrorInfo(productData) {
         return `Una o más propiedades en los datos del producto están faltando o no son válidas.
-    Propiedades requeridas:
-    * title: Debe ser un string, se recibió ${productData.title}.
-    * description: Debe ser un string, se recibió (${productData.description}).
-    * code: Debe ser un string, se recibió ${productData.code}.
-    * price: Debe ser un número positivo mayor que 0, se recibió ${productData.price}.
-    * stock: Debe ser un número positivo mayor que 0, se recibió ${productData.stock}.
-    * category: Debe ser un string, se recibió ${productData.category}.
-    * thumbnails: Debe ser un arreglo no vacío de URLs de imágenes, se recibió ${productData.thumbnails}.
-    `;
+        Propiedades requeridas:
+        * title: Debe ser un string, se recibió ${productData.title}.
+        * description: Debe ser un string, se recibió (${productData.description}).
+        * code: Debe ser un string, se recibió ${productData.code}.
+        * price: Debe ser un número positivo mayor que 0, se recibió ${productData.price}.
+        * stock: Debe ser un número positivo mayor que 0, se recibió ${productData.stock}.
+        * category: Debe ser un string, se recibió ${productData.category}.
+        * thumbnails: Debe ser un arreglo no vacío de URLs de imágenes, se recibió ${productData.thumbnails}.
+        `;
     }
 
     static generatePidErrorInfo(pid) {
@@ -111,12 +111,21 @@ export default class ErrorGenerator {
 
     // Usuarios:
 
-    static generateUserErrorInfo(user) {
-        return `Una o más propiedades estaban incompletas o no son válidas.
-
+    static generateRegisterDataErrorInfo(userRegister) {
+        return `Una o más propiedades en los datos de registro están faltando o no son válidas.
         Propiedades requeridas:
-        * first_name: Debe ser una cadena, recibido ${user.first_name}.
-        * last_name: Debe ser una cadena, recibido ${user.last_name}.`;
+        * first_name: Debe ser un string sin números, se recibió ${userRegister.first_name}.
+        * last_name: Debe ser un string sin números, se recibió ${userRegister.last_name}.
+        * email: Debe ser un correo electrónico válido, se recibió ${userRegister.email}.
+        * age: Debe ser un número, se recibió ${userRegister.age}.
+        * password: Se requiere una contraseña válida, puede ser un string, un número o una combinación de ambos.`
     }
 
+    static generateLoginDataErrorInfo(userLogin){
+        return `Una o más propiedades en los datos del login están faltando o no son válidas.
+        Propiedades requeridas:
+        * email: Debe ser un correo electrónico válido, se recibió ${userLogin.email}.
+        * password: Se requiere una contraseña válida, puede ser un string, un número o una combinación de ambos.`
+    }
+    
 }

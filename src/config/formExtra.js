@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
 import {
     envCoderSecret,
-    envCoderCookie
+    envCoderCookie,
+    envCoderUserIDCookie
 } from '../config.js';
 
 // Import UserController:
-import UserController from '../controllers/userController.js';
+import UserController from '../controllers/sessionController.js';
 
 // Import UserController:
 const userController = new UserController();
@@ -13,7 +14,7 @@ const userController = new UserController();
 // Función para completeProfile: 
 export const completeProfile = async (req, res) => {
 
-    const userId = req.cookies.userId; // Obtener el valor de la cookie
+    const userId = req.signedCookies.envCoderUserIDCookie; // Obtener el valor de la cookie
     // Resto del código para completar el perfil...
 
     console.log('Valor de la cookie userId:', userId);
@@ -52,8 +53,8 @@ export const completeProfile = async (req, res) => {
         });
 
         // Token jwt: 
-        res.cookie(envCoderCookie, token, {
-            httpOnly: true
+        res.cookie(envCoderCookie, token, { 
+            httpOnly: true, signed:true, maxAge: 10* 60 *1000
         })
 
         // Redirigir al usuario a la vista de productos:

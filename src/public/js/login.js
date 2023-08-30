@@ -14,6 +14,9 @@ form.addEventListener('submit', async (e) => {
             },
         });
         const json = await response.json();
+
+    // Acá tendria que agregar la logica para que si se loguea el admin, no se lo redirija a la vista de productos sino que se lo redija al panel de admin, tendria que extraer el role del response...
+
         if (response.ok) {
             console.log('Usuario logueado con éxito.');
             form.reset();

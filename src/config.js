@@ -32,6 +32,9 @@ export const envCoderSecret = process.env.CODER_SECRET;
 export const envCoderCookie = process.env.CODER_COOKIE;
 export const envCoderUserIDCookie = process.env.CODER_USER;
 
+// Firma de Cokkies:
+export const envCookieParser = process.env.FIRMA_COOKIE;
+
 // ADMIN:
 export const envAdminCoder = process.env.ADMIN_EMAIL;
 export const envPassCoder = process.env.ADMIN_PASSWORD;

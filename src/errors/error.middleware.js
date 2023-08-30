@@ -1,7 +1,7 @@
 import ErrorEnums from "./error.enums.js";
 
 export const errorMiddleware = (error, req, res, next) => {
-    
+
     req.logger.warn(error.cause);
 
     switch (error.code) {
@@ -122,7 +122,7 @@ export const errorMiddleware = (error, req, res, next) => {
 
             // Mensajes: 
 
-            case ErrorEnums.INVALID_MESSAGE_DATA:
+        case ErrorEnums.INVALID_MESSAGE_DATA:
             res.status(400).send({
                 status: "error",
                 error: error.name,
@@ -132,7 +132,7 @@ export const errorMiddleware = (error, req, res, next) => {
             });
             break;
 
-            case ErrorEnums.INVALID_ID_MESSAGE_ERROR:
+        case ErrorEnums.INVALID_ID_MESSAGE_ERROR:
             res.status(400).send({
                 status: "error",
                 error: error.name,
@@ -144,7 +144,7 @@ export const errorMiddleware = (error, req, res, next) => {
 
             // Ticket:
 
-            case ErrorEnums.INVALID_TICKET_DATA:
+        case ErrorEnums.INVALID_TICKET_DATA:
             res.status(400).send({
                 status: "error",
                 error: error.name,
@@ -154,13 +154,35 @@ export const errorMiddleware = (error, req, res, next) => {
             });
             break;
 
-            case ErrorEnums.INVALID_ID_TICKET_ERROR:
+        case ErrorEnums.INVALID_ID_TICKET_ERROR:
             res.status(400).send({
                 status: "error",
                 error: error.name,
                 cause: error.cause,
                 message: error.message,
                 code: ErrorEnums.INVALID_ID_TICKET_ERROR
+            });
+            break;
+
+            // Session: 
+
+        case ErrorEnums.INVALID_REGISTER_DATA:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_REGISTER_DATA
+            });
+            break;
+
+        case ErrorEnums.INVALID_LOGIN_DATA:
+            res.status(400).send({
+                status: "error",
+                error: error.name,
+                cause: error.cause,
+                message: error.message,
+                code: ErrorEnums.INVALID_LOGIN_DATA
             });
             break;
 

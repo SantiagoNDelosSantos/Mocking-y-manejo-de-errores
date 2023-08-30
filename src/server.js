@@ -1,4 +1,4 @@
-// Importaciones de paquetes y módulos
+// Import de paquetes y módulos
 import express, {
     urlencoded
 } from 'express';
@@ -9,20 +9,20 @@ import {
     Server
 } from 'socket.io';
 
-// Importación de rutas:
+// Import de rutas:
 import cartRouter from './routes/cart.router.js';
 import msmRouter from './routes/message.router.js';
 import productsRouter from './routes/products.router.js';
-import userRouter from './routes/session.router.js'
+import sessionRouter from './routes/session.router.js'
 import viewsRouter from "./routes/views.router.js";
 import ticketRouter from "./routes/ticket.router.js";
 import mockRouter from './routes/mock.router.js'
 import loggerRouter from './routes/loggerTest.router.js'
 
-// Importación de controladores: 
+// Import de controladores: 
 import ViewsController from './controllers/viewsController.js';
 
-// Importación de configuraciones de Passport:
+// Import de configuraciones de Passport:
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import {
@@ -35,10 +35,10 @@ import {
     initializePassportJWT
 } from './config/jwt.passport.js';
 
-// Importación de variables de entorno:
+// Import de variables de entorno:
 import {
     envMongoURL,
-    envPort
+    envPort, envCookieParser
 } from './config.js';
 
 // Importación middleware para errores:
@@ -68,7 +68,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
 // Inicialización de Passport 
-app.use(cookieParser());
+app.use(cookieParser(envCookieParser));
 initializePassportLocal();
 initializePassportJWT();
 initializePassportGitHub();
@@ -95,6 +95,7 @@ socketServer.on("connection", async (socket) => {
 
     // Envío de todos los productos en tiempo real:
     const productsResponse = await viewsController.getAllProductsControllerV();
+
     socket.emit('products', productsResponse.result);
 
     // Recibo los filtros de main.js en busquedaProducts:
@@ -128,7 +129,7 @@ app.use((req, res, next) => {
 app.use('/api/carts/', cartRouter);
 app.use('/api/chat/', msmRouter);
 app.use('/api/products', productsRouter);
-app.use('/api/sessions', userRouter);
+app.use('/api/sessions', sessionRouter);
 app.use('/api/tickets', ticketRouter);
 app.use('/', viewsRouter);
 app.use('/mockProducts', mockRouter);

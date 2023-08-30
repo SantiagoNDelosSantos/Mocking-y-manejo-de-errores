@@ -5,7 +5,7 @@ import {
 } from 'passport-github2';
 
 // Import UserController:
-import UserController from '../controllers/userController.js';
+import SessionController from '../controllers/sessionController.js';
 
 // Import CartController:
 import CartController from '../controllers/cartController.js';
@@ -18,7 +18,7 @@ import {
 } from '../config.js';
 
 // Instancia de UserController: 
-const userController = new UserController();
+const userController = new SessionController();
 
 // Instancia de CartController: 
 const cartController = new CartController();

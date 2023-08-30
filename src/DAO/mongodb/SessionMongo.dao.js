@@ -11,29 +11,30 @@ import {
     envMongoURL
 } from "../../config.js";
 
-// Clase para el DAO de usuarios:
-export default class UserDAO {
+// Clase para el DAO de sesiones/usuarios:
+export default class SessionDAO {
 
     // Conexión Mongoose:
     connection = mongoose.connect(envMongoURL);
 
     // Crear usuario - DAO: 
     async createUser(info) {
+        let response = {}
         try {
-            console.log(info)
             const result = await userModel.create(info);
-            console.log(result)
-            return result;
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al registrar el usurio - DAO. Error original: " + error.message);
-        }
+            response.status = "error";
+            response.message = "Error al registrar al usurio - DAO: " + error.message;
+        };
+        return response;
     }
 
     // Buscar usuario por email, nombre de usuario o id - DAO:
     async getUserByEmailOrNameOrId(identifier) {
+        let response = {};
         try {
-
-            console.log(identifier)
             const conditions = [{
                     email: identifier
                 },
@@ -46,34 +47,31 @@ export default class UserDAO {
                     _id: identifier
                 });
             }
-
-            const result = await userModel.findOne({
-                $or: conditions
-            });
-
-            console.log(result)
-            return result;
+            const result = await userModel.findOne({ $or: conditions });
+            response.status = "success";
+            response.result = result;
         } catch (error) {
-            throw new Error("Error al obtener el usuario por Email, Nombre o ID - DAO. Error original: " + error.message);
-        }
+            response.status = "error";
+            response.message = "Error al obtener el usuario - DAO. Error original: " + error.message;
+        };
+        return response;
     }
 
     // Actualizar usuario - DAO:
     async updateUser(uid, updateUser) {
+        let response = {};
         try {
-            let result = await userModel.updateOne({
-                _id: uid
-            }, {
-                $set: updateUser
-            });
-
+            let result = await userModel.updateOne({ _id: uid }, { $set: updateUser });
             let userUpdate = await userModel.findOne({
                 _id: uid
             });
-            return userUpdate;
+            response.status = "success";
+            response.result = userUpdate;
         } catch (error) {
-            throw new Error("Error al actualizar el usuario. Error original: " + error.message);
-        }
-    }
+            response.status = "error";
+            response.message = "Error al actualizar los datos del usuario - DAO: " + error.message;
+        };
+        return response;
+    };
 
-}
+};
