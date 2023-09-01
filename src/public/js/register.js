@@ -23,7 +23,7 @@ form.addEventListener('submit', async (e) => {
             Swal.fire({
                 icon: 'error',
                 title: 'Error de registro',
-                text: json.message || 'Error en el registro. Inténtalo de nuevo.',
+                text: json.cause || json.message || 'Error en el registro. Inténtalo de nuevo.',
             });
         }
     } 

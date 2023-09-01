@@ -29,15 +29,18 @@ export const envCallbackURL = process.env.CALLBACK_URL;
 
 // JWT:
 export const envCoderSecret = process.env.CODER_SECRET;
-export const envCoderCookie = process.env.CODER_COOKIE;
+// Nombre de la cookie con el jwt token: 
+export const envCoderTokenCookie = process.env.CODER_COOKIE;
+
+// Nombre de la cookie para enviar el ID del usuario creado con la estrategia de GitHub, al formulario extra:
 export const envCoderUserIDCookie = process.env.CODER_USER;
 
-// Firma de Cokkies:
+// Firma de Cookies:
 export const envCookieParser = process.env.FIRMA_COOKIE;
 
 // ADMIN:
-export const envAdminCoder = process.env.ADMIN_EMAIL;
-export const envPassCoder = process.env.ADMIN_PASSWORD;
+export const envAdminEmailCoder = process.env.ADMIN_EMAIL;
+export const envAdminPassCoder = process.env.ADMIN_PASSWORD;
 
 console.log(program.opts())
 

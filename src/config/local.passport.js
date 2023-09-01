@@ -16,8 +16,8 @@ import CartController from '../controllers/cartController.js';
 
 // Import email y contraseña admin:
 import {
-    envAdminCoder,
-    envPassCoder
+    envAdminEmailCoder,
+    envAdminPassCoder
 } from '../config.js';
 
 // Instancia de localStrategy: 
@@ -30,7 +30,7 @@ let sessionController = new SessionController();
 let cartController = new CartController();
 
 // Función de PassportLocal para exportarla:
-export const initializePassportLocal = (req, res, next) => {
+export const initializePassportLocal = (req, res) => {
 
     // Primera estrategia - Registro:
 
@@ -71,7 +71,7 @@ export const initializePassportLocal = (req, res, next) => {
                 // Si el usuario no esta registrado en la base de datos (404), entocnes se procede al registro: 
                 else if (existSessionControl.statusCode === 404) {
 
-                    // Crearmmos un carrito para el usuario: 
+                    // Creammos un carrito para el usuario: 
                     const resultCartControl = await cartController.createCartController(req, res);
 
                     // Validamos si no hubo algun error en el cartController, si lo hubo devolvemos el mensaje de error:
@@ -81,7 +81,7 @@ export const initializePassportLocal = (req, res, next) => {
                         });
                     }
 
-                    // Si no hubo error en el cartController continuamos el registro:
+                    // Si no hubo error en el cartController continuamos con el registro:
                     else if (resultCartControl.statusCode === 200) {
 
                         // Extraemos solo el carrito creado por el cartController: 
@@ -107,6 +107,7 @@ export const initializePassportLocal = (req, res, next) => {
                                 message: createSessionControl.message
                             });
                         }
+
                         // Si no hubo error en el sessionController se crea el nuevo usuario y se finaliza el registro:
                         else if (createSessionControl.statusCode === 200) {
                             const user = createSessionControl.result;
@@ -135,14 +136,15 @@ export const initializePassportLocal = (req, res, next) => {
             try {
 
                 // Verificar si el usuario es administrador
-                if (username === envAdminCoder && password === envPassCoder) {
+                if (username === envAdminEmailCoder && password ===  envAdminPassCoder) {
                     let userAdmin = {
-                        name: "Admin",
-                        email: config.envAdminCoder,
-                        age: "00",
+                        first_name: "Admin",
+                        last_name: "X",
+                        email: envAdminEmailCoder,
+                        age: 0,
+                        password: envAdminPassCoder,
                         role: "admin",
-                        id: 0,
-                        cart: 0,
+                        cart: null,
                     };
                     return done(null, userAdmin);
                 }

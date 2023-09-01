@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import {
     envCoderSecret,
-    envCoderCookie,
+    envCoderTokenCookie,
     envCoderUserIDCookie
 } from '../../config.js';
 
@@ -23,7 +23,6 @@ import ErrorGenerator from "../../errors/error.info.js";
 
 // Middleware Registro:
 export const registerUser = (req, res, next) => {
-
     try {
         const userRegister = req.body;
         userRegister.age = parseInt(userRegister.age, 10);
@@ -44,8 +43,7 @@ export const registerUser = (req, res, next) => {
             });
     } catch (error) {
         return next(error);
-    }
-
+    };
     passport.authenticate('register', {
         session: false
     }, (err, user, info) => {
@@ -62,11 +60,10 @@ export const registerUser = (req, res, next) => {
             user
         });
     })(req, res, next);
-
 };
 
+// Middleware Login:
 export const loginUser = (req, res, next) => {
-
     try {
         const userLogin = req.body;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -79,14 +76,13 @@ export const loginUser = (req, res, next) => {
             });
     } catch (error) {
         return next(error);
-    }
-
+    };
     passport.authenticate('login', {
         session: false
     }, (err, user, info) => {
         if (err) {
             return next(err);
-        }
+        };
         if (!user) {
             return res.status(401).json({
                 message: info.message
@@ -102,32 +98,33 @@ export const loginUser = (req, res, next) => {
             }, envCoderSecret, {
                 expiresIn: '7d'
             });
-            res.cookie(envCoderCookie, token, {
+            res.cookie(envCoderTokenCookie, token, {
                 httpOnly: true,
-                signed: true /*, maxAge*/
+                signed: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000
             }).send({
-                status: 'success'
+                status: 'success',
+                role: user.role
             });
-        }
+        };
     })(req, res, next);
 };
 
-
-
+// Middleware GitHub:
 export const authenticateWithGitHub = (req, res, next) => {
-
-
-    // custom error
-
     passport.authenticate('github', {
         session: false
-    }, (err, user, info) => {
-        console.log('usurrio' + user)
+    }, ( err, user, info) => {
         if (err) {
             return next(err);
-        }
+        };
+        if (!user) {
+            return res.status(401).json({
+                message: info.message
+            });
+        };
         if (user.password === "Sin contraseña.") {
-            // Crear una cookie con el ID del usuario
+            // Cookie con el ID del usuario creado mediante GitHub para que el formulario extra pueda acceder al usuario en la base de datos y actualizarlo con los datos complementarios, antes de crear el token de jwt: 
             res.cookie(envCoderUserIDCookie, user._id, {
                 httpOnly: true,
                 signed: true,
@@ -135,52 +132,20 @@ export const authenticateWithGitHub = (req, res, next) => {
             }).redirect('/completeProfile');
         } else {
             res.redirect('/products');
-        }
+        };
     })(req, res, next);
 };
 
+// Middleware Current:
 export const getCurrentUser = (req, res) => {
-
-    // custom error
-
     res.send(new CurrentUserDTO(req.user));
 };
 
+// Middleware Profile:
 export const getProfileUser = async (req, res) => {
-
-    // custom error
-
     const user = new CurrentUserDTO(req.user);
-
     res.render('profile', {
         title: 'Perfil',
         user: user
     });
-
 };
-
-
-
-/*
-
-// Current user y Profile User solo llegan al controlador no tienen capa de service:
-
-// Current user:
-sessionRouter.get('/current', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const result = await sessionController.getCurrentUserController(req, res);
-    if (result) {
-        req.logger.debug(result)
-    };
-});
-
-// Ver perfil usuario: 
-sessionRouter.get('/profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const result = await sessionController.getProfifleUserController(req, res);
-    if (result) {
-        req.logger.debug(result)
-    };
-});
-
-export default sessionRouter;
-
-*/

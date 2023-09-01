@@ -3,7 +3,7 @@ import passport from "passport";
 import jwt from "passport-jwt";
 
 // Importación variables de entorno: 
-import { envCoderSecret, envCoderCookie} from "../config.js";
+import { envCoderSecret, envCoderTokenCookie} from "../config.js";
 
 const JWTStrategy = jwt.Strategy;
 const ExtracJWT = jwt.ExtractJwt;
@@ -24,7 +24,7 @@ export const initializePassportJWT = () => {
 const cookieExtractor = (req) => {
     let token = null;
     if (req && req.signedCookies) {
-        token = req.signedCookies[envCoderCookie]
+        token = req.signedCookies[envCoderTokenCookie]
     }
     return token 
 };

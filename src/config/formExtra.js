@@ -1,15 +1,20 @@
 import jwt from 'jsonwebtoken';
 import {
     envCoderSecret,
-    envCoderCookie,
+    envCoderTokenCookie,
     envCoderUserIDCookie
 } from '../config.js';
 
-// Import UserController:
-import UserController from '../controllers/sessionController.js';
+// Import createHash: 
+import {
+    createHash
+} from "../utils.js";
 
 // Import UserController:
-const userController = new UserController();
+import SessionController from '../controllers/sessionController.js';
+
+// Instancia de SessionController: 
+let sessionController = new SessionController();
 
 // Función para completeProfile: 
 export const completeProfile = async (req, res) => {
@@ -22,52 +27,60 @@ export const completeProfile = async (req, res) => {
     const last_name = req.body.last_name;
     const email = req.body.email;
     const age = req.body.age;
-    const password = req.body.password;
+    const password = createHash(req.body.password);
 
     try {
 
-        // Crear el actualizar el  usuario con los datos del formulario:
+        // Crear el objeto con los datos del formulario extra, para actualizar al usuario creado con los datos de GitHub:
         const updateUser = {
             last_name,
             email,
             age,
-            password,
+            password
         };
 
         // Actualizar el usuario en la base de datos:
+        const updateSessionControl = await sessionController.updateUserController(req, res, userId, updateUser);
 
-        const responseControllerU = await userController.updateUserController(userId, updateUser);
-        // Extraermos solo el resultado:
-        const userCompleteDB = responseControllerU.result;
+        // Verificamos si no hubo algun error en el sessionController o si no se encontro el usuario (404), de ocurrir devolvemos el mensaje de error:
+        if (updateSessionControl.statusCode === 500 || updateSessionControl.statusCode === 404) {
+            return done(null, false, {
+                message: updateSessionControl.message
+            });
+        }
 
-        // Generar el token JWT:
-        let token = jwt.sign({
-            email: userCompleteDB.email,
-            first_name: userCompleteDB.first_name,
-            tickets: userCompleteDB.tickets,
-            role: userCompleteDB.role,
-            cart: userCompleteDB.cart,
-            userID: userCompleteDB._id
-        }, envCoderSecret, {
-            expiresIn: '7d'
-        });
+        // Si se encuantra el usuario , en dicho caso actualizamos el usuario:
+        else if (updateSessionControl.statusCode === 200) {
 
-        // Token jwt: 
-        res.cookie(envCoderCookie, token, { 
-            httpOnly: true, signed:true, maxAge: 10* 60 *1000
-        })
+            // Extraermos solo el resultado:
+            const userExtraForm = updateSessionControl.result;
 
-        // Redirigir al usuario a la vista de productos:
-        res.send({
-            status: 'success',
-            redirectTo: '/products'
-        });
+            // Generar el token JWT:
+            let token = jwt.sign({
+                email: userExtraForm.email,
+                first_name: userExtraForm.first_name,
+                tickets: userExtraForm.tickets,
+                role: userExtraForm.role,
+                cart: userExtraForm.cart,
+                userID: userExtraForm._id
+            }, envCoderSecret, {
+                expiresIn: '7d'
+            });
+            // Token jwt: 
+            res.cookie(envCoderTokenCookie, token, {
+                httpOnly: true,
+                signed: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            })
+            // Redirigir al usuario a la vista de productos:
+            res.send({
+                status: 'success',
+                redirectTo: '/products'
+            });
+        }
 
     } catch (error) {
-        console.error('Error al completar el perfil:', error);
-        res.status(500).json({
-            message: 'Error al completar el perfil. Inténtalo de nuevo.'
-        });
+        return('Error al completar el perfil:' + error);
     }
 
 };

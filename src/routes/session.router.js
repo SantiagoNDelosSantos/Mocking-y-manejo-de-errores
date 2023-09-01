@@ -1,8 +1,19 @@
-import { Router } from 'express';
+import {
+    Router
+} from 'express';
 import passport from 'passport';
-import {completeProfile} from '../config/formExtra.js'
 
-import { registerUser, loginUser, getCurrentUser, authenticateWithGitHub, getProfileUser} from './Middlewares/passport.middleware.js';
+import {
+    registerUser,
+    loginUser,
+    getCurrentUser,
+    authenticateWithGitHub,
+    getProfileUser
+} from './Middlewares/passport.middleware.js';
+
+import {
+    completeProfile
+} from '../config/formExtra.js';
 
 const sessionRouter = Router();
 
@@ -12,25 +23,25 @@ sessionRouter.post('/register', registerUser);
 // Login:
 sessionRouter.post('/login', loginUser);
 
-
-
-
-
-
-
-
-// Current user:
-sessionRouter.get('/current', passport.authenticate('jwt', { session: false }), getCurrentUser);
-
 // GitHub:
-sessionRouter.get('/github', passport.authenticate('github', { session: false, scope: 'user:email' }));
+sessionRouter.get('/github', passport.authenticate('github', {
+    session: false,
+    scope: 'user:email'
+}));
 
 sessionRouter.get('/githubcallback', authenticateWithGitHub);
 
 // Formulario extra - GitHub:
 sessionRouter.post('/completeProfile', completeProfile);
 
+// Current user:
+sessionRouter.get('/current', passport.authenticate('jwt', {
+    session: false
+}), getCurrentUser);
+
 // Ver perfil usuario: 
-sessionRouter.get('/profile', passport.authenticate('jwt', { session: false }), getProfileUser)
+sessionRouter.get('/profile', passport.authenticate('jwt', {
+    session: false
+}), getProfileUser)
 
 export default sessionRouter;
