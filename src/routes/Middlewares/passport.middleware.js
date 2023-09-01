@@ -114,7 +114,7 @@ export const loginUser = (req, res, next) => {
 export const authenticateWithGitHub = (req, res, next) => {
     passport.authenticate('github', {
         session: false
-    }, ( err, user, info) => {
+    }, (err, user, info) => {
         if (err) {
             return next(err);
         };
