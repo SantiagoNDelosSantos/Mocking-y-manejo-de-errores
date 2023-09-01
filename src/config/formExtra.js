@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import {
     envCoderSecret,
-    envCoderTokenCookie,
-    envCoderUserIDCookie
+    envCoderTokenCookie
 } from '../config.js';
 
 // Import createHash: 
@@ -19,8 +18,8 @@ let sessionController = new SessionController();
 // Función para completeProfile: 
 export const completeProfile = async (req, res) => {
 
-    const userId = req.signedCookies.envCoderUserIDCookie; // Obtener el valor de la cookie
-    // Resto del código para completar el perfil...
+    // Obtenemos la cookie con el ID del usuario base creado con los datos de GitHub: 
+    const userId = req.signedCookies.IdentifierGitH; 
 
     console.log('Valor de la cookie userId:', userId);
 
@@ -42,15 +41,8 @@ export const completeProfile = async (req, res) => {
         // Actualizar el usuario en la base de datos:
         const updateSessionControl = await sessionController.updateUserController(req, res, userId, updateUser);
 
-        // Verificamos si no hubo algun error en el sessionController o si no se encontro el usuario (404), de ocurrir devolvemos el mensaje de error:
-        if (updateSessionControl.statusCode === 500 || updateSessionControl.statusCode === 404) {
-            return done(null, false, {
-                message: updateSessionControl.message
-            });
-        }
-
-        // Si se encuantra el usuario , en dicho caso actualizamos el usuario:
-        else if (updateSessionControl.statusCode === 200) {
+        // Si se encuantra el usuario lo actualizamos:
+        if (updateSessionControl.statusCode === 200) {
 
             // Extraermos solo el resultado:
             const userExtraForm = updateSessionControl.result;
@@ -77,10 +69,11 @@ export const completeProfile = async (req, res) => {
                 status: 'success',
                 redirectTo: '/products'
             });
-        }
-
+        };
+        
     } catch (error) {
-        return('Error al completar el perfil:' + error);
-    }
+        req.logger.error(error.message)
+        return ('Error al completar el perfil del usuario creado con GitHub - formExtra.js: ' + error.message);
+    };
 
 };

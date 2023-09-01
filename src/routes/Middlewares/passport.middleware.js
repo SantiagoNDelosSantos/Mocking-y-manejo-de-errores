@@ -11,10 +11,10 @@ import {
     CurrentUserDTO
 } from '../../controllers/DTO/user.dto.js'
 
-/*
 // Import mongoose para validación de IDs:
-import mongoose from 'mongoose';
-*/
+import {
+    createBDUserGH
+} from '../../config/gitHub.passport.js';
 
 // Errores:
 import ErrorEnums from "../../errors/error.enums.js";
@@ -114,7 +114,7 @@ export const loginUser = (req, res, next) => {
 export const authenticateWithGitHub = (req, res, next) => {
     passport.authenticate('github', {
         session: false
-    }, (err, user, info) => {
+    }, async (err, user, info) => {
         if (err) {
             return next(err);
         };
@@ -122,17 +122,20 @@ export const authenticateWithGitHub = (req, res, next) => {
             return res.status(401).json({
                 message: info.message
             });
-        };
-        if (user.password === "Sin contraseña.") {
-            // Cookie con el ID del usuario creado mediante GitHub para que el formulario extra pueda acceder al usuario en la base de datos y actualizarlo con los datos complementarios, antes de crear el token de jwt: 
-            res.cookie(envCoderUserIDCookie, user._id, {
-                httpOnly: true,
-                signed: true,
-                maxAge: 1 * 60 * 1000
-            }).redirect('/completeProfile');
-        } else {
-            res.redirect('/products');
-        };
+        } else if (user) {
+            const userSemiCompleto = await createBDUserGH(req, res, user, next);
+            console.log(userSemiCompleto)
+            if (userSemiCompleto.password === "Sin contraseña.") {
+                // Cookie con el ID del usuario creado mediante GitHub para que el formulario extra pueda acceder al usuario en la base de datos y actualizarlo con los datos complementarios, antes de crear el token de jwt: 
+                res.cookie(envCoderUserIDCookie, userSemiCompleto._id, {
+                    httpOnly: true,
+                    signed: true,
+                    maxAge: 1 * 60 * 1000
+                }).redirect('/completeProfile');
+            } else {
+                res.redirect('/products');
+            };
+        }
     })(req, res, next);
 };
 
