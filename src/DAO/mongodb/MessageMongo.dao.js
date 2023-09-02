@@ -36,8 +36,13 @@ export default class MessageDAO {
         let response = {};
         try {
             let result = await messageModel.find().lean();
-            response.status = "success";
-            response.result = result;
+            if (result.length === 0) {
+                response.status = "not found messages";
+                response.result = result;
+            } else {
+                response.status = "success";
+                response.result = result;
+            };
         } catch (error) {
             response.status = "error";
             response.message = "Error al obtener los mensajes - DAO: " + error.message;
@@ -49,9 +54,15 @@ export default class MessageDAO {
     async deleteMessage(mid) {
         let response = {};
         try {
-            let result = await messageModel.deleteOne({ _id: mid });
-            response.status = "success";
-            response.result = result;
+            let result = await messageModel.deleteOne({
+                _id: mid
+            });
+            if (result.deletedCount === 0) {
+                response.status = "not found message";
+            } else if (result.deletedCount === 1) {
+                response.status = "success";
+                response.result = result;
+            };
         } catch (error) {
             response.status = "error";
             response.message = "Error al eliminar el mensaje - DAO: " + error.message;

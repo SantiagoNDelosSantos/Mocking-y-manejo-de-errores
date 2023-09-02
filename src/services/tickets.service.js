@@ -19,16 +19,13 @@ export default class TicketService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al crear el ticket - Service: resultDao.result es null.";
-            } else if (resultDAO.status === "success"){
+            } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
                 response.message = "Ticket creado exitosamente.";
                 response.result = resultDAO.result;
             };
         } catch (error) {
-             response.statusCode = 500;
+            response.statusCode = 500;
             response.message = "No se pudo crear el ticket - Service: " + error.message;
         };
         return response;
@@ -42,7 +39,7 @@ export default class TicketService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
+            } else if (resultDAO.status === "not found ticket") {
                 response.statusCode = 404;
                 response.message = `No se encontro ningún ticket con el ID ${tid}.`;
             } else if (resultDAO.status === "success") {

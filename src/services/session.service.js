@@ -19,9 +19,6 @@ export default class SessionService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error  al registrar al usurio - Service: resultDao.result es null.";
             } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
                 response.message = "Usuario registrado exitosamente.";
@@ -42,7 +39,7 @@ export default class SessionService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
+            } else if (resultDAO.status === "not found user") {
                 response.statusCode = 404;
                 response.message = `No se encontró ningún usuario con el Email, Nombre o ID, ${identifier}.`;
             } else if (resultDAO.status === "success") {
@@ -65,12 +62,9 @@ export default class SessionService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al actualizar los datos del usuario - Service: resultDao.result es null.";
-            } else if (resultDAO.result.matchedCount === 0) {
+            } else if (resultDAO.status === "not found user") {
                 response.statusCode = 404;
-                response.message = `No se encontró ningún usuario con el ID ${uid}.`;
+                response.message = "Usuario no encontrado.";
             } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
                 response.message = "Usuario actualizado exitosamente.";

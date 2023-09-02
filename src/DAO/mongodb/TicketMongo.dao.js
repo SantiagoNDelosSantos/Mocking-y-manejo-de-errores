@@ -2,10 +2,14 @@
 import mongoose from "mongoose";
 
 // Import del modelo de ticket - Individual:
-import { ticketModel } from './models/ticket.model.js'
+import {
+    ticketModel
+} from './models/ticket.model.js'
 
 // Importación de variables de entorno: 
-import { envMongoURL } from "../../config.js";
+import {
+    envMongoURL
+} from "../../config.js";
 
 // Clase para el DAO de tickets:
 export default class TicketDAO {
@@ -23,7 +27,7 @@ export default class TicketDAO {
             response.result = result;
         } catch (error) {
             response.status = "error";
-            response.message = "No se pudo crear el ticket - DAO. Error original: " + error.message;
+            response.message = "No se pudo crear el ticket - DAO: " + error.message;
         };
         return response;
     };
@@ -35,13 +39,17 @@ export default class TicketDAO {
             const result = await ticketModel.findOne({
                 _id: tid
             });
-            response.status = "success";
-            response.result = result;
+            if (result === null) {
+                response.status = "not found ticket";
+            } else {
+                response.status = "success";
+                response.result = result;
+            };
         } catch (error) {
             response.status = "error";
             response.message = "Error al obtener el ticket por ID - DAO: " + error.message;
         };
         return response;
     };
-    
+
 };

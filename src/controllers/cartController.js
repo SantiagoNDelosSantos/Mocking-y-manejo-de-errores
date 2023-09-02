@@ -113,18 +113,17 @@ export default class CartController {
                     message: "El ID de carrito o de producto no tiene un formato válido.",
                     code: ErrorEnums.INVALID_ID_CART_OR_PRODUCT_ERROR
                 });
-            }
-            if (!quantity || isNaN(quantity) || quantity <= 0) {
+            } else if (!quantity || isNaN(quantity) || quantity <= 0) {
                 CustomError.createError({
                     name: "Error al intentar agregar un producto al carrito.",
                     cause: ErrorGenerator.generateQuantityErrorInfo(quantity),
                     message: "La cantidad debe ser un número válido y mayor que cero.",
                     code: ErrorEnums.QUANTITY_INVALID_ERROR
                 });
-            }
+            };
         } catch (error) {
             return next(error)
-        }
+        };
         let response = {};
         try {
             const resultService = await this.cartService.addProductToCartService(cid, pid, quantity);
@@ -132,12 +131,12 @@ export default class CartController {
             response.message = resultService.message;
             if (resultService.statusCode === 500) {
                 req.logger.error(response.message);
-            } else if (resultService.statusCode === 404 || resultService.statusCode === 400) {
+            } else if (resultService.statusCode === 404) {
                 req.logger.warn(response.message);
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = 'Error al agregar el producto al carrito - Controller: ' + error.message;
@@ -145,6 +144,21 @@ export default class CartController {
         };
         return response;
     };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Procesamiento de la compra del usuario:
     async purchaseProductsInCartController(req, res, next) {
@@ -240,12 +254,9 @@ export default class CartController {
 
     // Eliminar un producto de un carrito - Controller:
     async deleteProductFromCartController(req, res, next) {
-
-
+        const cid = req.params.cid;
+        const pid = req.params.pid;
         try {
-            const cid = req.params.cid;
-            const pid = req.params.pid;
-
             if (!cid || !mongoose.Types.ObjectId.isValid(cid) || !pid || !mongoose.Types.ObjectId.isValid(pid)) {
                 CustomError.createError({
                     name: "Error al intentar eliminar el producto del carrito.",
@@ -257,39 +268,31 @@ export default class CartController {
         } catch (error) {
             return next(error)
         }
-
-
         let response = {};
         try {
-            const cid = req.params.cid;
-            const pid = req.params.pid;
-            const responseService = await this.cartService.deleteProductFromCartService(cid, pid);
-            response.status = responseService.status;
-            response.message = responseService.message;
-            response.statusCode = responseService.statusCode;
-            if (responseService.status === "success") {
-                response.result = responseService.result;
-            };
-            if (responseService.status === "error") {
-                response.error = responseService.error;
-            };
-            console.log(response.message);
-            return response;
+            const resultService = await this.cartService.deleteProductFromCartService(cid, pid);
+            response.statusCode = resultService.statusCode;
+            response.message = resultService.message;
+            if (resultService.statusCode === 500) {
+                req.logger.error(response.message);
+            } else if (resultService.statusCode === 404) {
+                req.logger.warn(response.message);
+            } else if (resultService.statusCode === 200) {
+                response.result = resultService.result;
+                req.logger.debug(response.message);
+            }
         } catch (error) {
-            console.error('Error:', error.message);
-            response.status = "error";
-            response.message = "Error al eliminar producto del carrito - Controller: " + error.message;
-            response.error = error.message;
             response.statusCode = 500;
-            return response;
+            response.message = "Error al eliminar producto del carrito - Controller: " + error.message;
+            req.logger.error(response.message);
         };
+        return response;
     };
 
     // Eliminar todos los productos de un carrito - Controller:
     async deleteAllProductsFromCartController(req, res, next) {
-
+        const cid = req.params.cid;
         try {
-            const cid = req.params.cid;
             if (!cid || !mongoose.Types.ObjectId.isValid(cid)) {
                 CustomError.createError({
                     name: "Error al intentar eliminar todos los productos del carrito.",
@@ -297,43 +300,36 @@ export default class CartController {
                     message: "El ID de Carrito Proporcionado no es Válido.",
                     code: ErrorEnums.INVALID_ID_CART_ERROR
                 });
-            }
+            };
         } catch (error) {
             return next(error)
-        }
-
-
+        };
         let response = {};
         try {
-            const cid = req.params.cid;
-            const responseService = await this.cartService.deleteAllProductFromCartService(cid);
-            response.status = responseService.status;
-            response.message = responseService.message;
-            response.statusCode = responseService.statusCode;
-            if (responseService.status === "success") {
-                response.result = responseService.result;
+            const resultService = await this.cartService.deleteAllProductFromCartService(cid);
+            response.statusCode = resultService.statusCode;
+            response.message = resultService.message;
+            if (resultService.statusCode === 500) {
+                req.logger.error(response.message);
+            } else if (resultService.statusCode === 404) {
+                req.logger.warn(response.message);
+            } else if (resultService.statusCode === 200) {
+                response.result = resultService.result;
+                req.logger.debug(response.message);
             };
-            if (responseService.status === "error") {
-                response.error = responseService.error;
-            };
-            console.log(response.message);
-            return response;
         } catch (error) {
-            console.error('Error:', error.message);
-            response.status = "error";
-            response.message = "Error al eliminar todos los productos del carrito - Controller: " + error.message;
-            response.error = error.message;
             response.statusCode = 500;
-            return response;
+            response.message = "Error al eliminar todos los productos del carrito - Controller: " + error.message;
+            req.logger.error(response.message);
         };
+        return response;
     };
 
     //  Actualizar un carrito - Controler:
     async updateCartController(req, res, next) {
-
+        const cid = req.params.cid;
+        const updatedCartFields = req.body;
         try {
-            const cid = req.params.cid;
-            const updatedCartFields = req.body;
             if (!cid || !mongoose.Types.ObjectId.isValid(cid)) {
                 CustomError.createError({
                     name: "Error al intentar actualizar el carrito.",
@@ -341,8 +337,7 @@ export default class CartController {
                     message: "El ID de carrito proporcionado no es válido.",
                     code: ErrorEnums.INVALID_ID_CART_ERROR
                 });
-            }
-            if (!updatedCartFields.products || Object.keys(updatedCartFields).length === 0) {
+            } else if (!updatedCartFields.products || Object.keys(updatedCartFields).length === 0) {
                 CustomError.createError({
                     name: "Error al intentar actualizar el carrito.",
                     cause: ErrorGenerator.generateUpdatedCartFieldsErrorInfo(updatedCartFields),
@@ -353,54 +348,44 @@ export default class CartController {
         } catch (error) {
             return next(error)
         }
-
-
         let response = {};
         try {
-            const cid = req.params.cid;
-            const updatedCartFields = req.body;
-            const responseService = await this.cartService.updateCartService(cid, updatedCartFields);
-            response.status = responseService.status;
-            response.message = responseService.message;
-            response.statusCode = responseService.statusCode;
-            if (responseService.status === "success") {
-                response.result = responseService.result;
-            };
-            if (responseService.status === "error") {
-                response.error = responseService.error;
-            };
-            console.log(response.message);
-            return response;
+            const resultService = await this.cartService.updateCartService(cid, updatedCartFields);
+            response.statusCode = resultService.statusCode;
+            response.message = resultService.message;
+            if (resultService.statusCode === 500) {
+                req.logger.error(response.message);
+            } else if (resultService.statusCode === 404) {
+                req.logger.warn(response.message);
+            } else if (resultService.statusCode === 200) {
+                response.result = resultService.result;
+                req.logger.debug(response.message);
+            }
         } catch (error) {
-            console.error('Error:', error.message);
-            response.status = "error";
-            response.message = "Error al actualizar el carrito - Controller: " + error.message;
-            response.error = error.message;
             response.statusCode = 500;
-            return response;
+            response.message = "Error al actualizar el carrito - Controller: " + error.message;
+            req.logger.error(response.message);
         };
+        return response;
     };
 
     // Actualizar la cantidad de un produco en carrito - Controller:
     async updateProductInCartController(req, res, next) {
-
+        const cid = req.params.cid;
+        const pid = req.params.pid;
+        const quantity = req.body.quantity;
         try {
-            const cid = req.params.cid;
-            const pid = req.params.pid;
-            const updatedProdInCart = req.body.quantity;
-            console.log(updatedProdInCart)
             if (!cid || !mongoose.Types.ObjectId.isValid(cid) || !pid || !mongoose.Types.ObjectId.isValid(pid)) {
                 CustomError.createError({
                     name: "Error al intentar actualizar el producto en carrito",
                     cause: ErrorGenerator.generateCidOrPidErrorInfo(cid, pid),
-                    message: "El ID de carrito o de producto no tiene un formato válido.",
+                    message: "El ID de carrito o de producto, no tiene un formato válido.",
                     code: ErrorEnums.INVALID_ID_CART_OR_PRODUCT_ERROR
                 });
-            }
-            if (!updatedProdInCart || !Number.isFinite(updatedProdInCart.quantity) || updatedProdInCart.quantity <= 0) {
+            } else if (!quantity || !Number.isFinite(quantity) || quantity <= 0) {
                 CustomError.createError({
                     name: "Error al intentar actualizar el producto en carrito",
-                    cause: ErrorGenerator.generateUpdatesProdInCartErrorInfo(updatedProdInCart),
+                    cause: ErrorGenerator.generateUpdatesProdInCartErrorInfo(quantity),
                     message: "No se proporcionó ningún quantity para el producto en carrito.",
                     code: ErrorEnums.INVALID_UPTATED_PROD_IN_CART
                 })
@@ -408,33 +393,25 @@ export default class CartController {
         } catch (error) {
             return next(error)
         }
-
         let response = {};
         try {
-            const cid = req.params.cid;
-            const pid = req.params.pid;
-            const updatedProdInCart = req.body;
-            const responseService = await this.cartService.updateProductInCartService(cid, pid, updatedProdInCart);
-            response.status = responseService.status;
-            response.message = responseService.message;
-            response.statusCode = responseService.statusCode;
-            if (responseService.status === "success") {
-                response.result = responseService.result;
+            const resultService = await this.cartService.updateProductInCartService(cid, pid, quantity);
+            response.statusCode = resultService.statusCode;
+            response.message = resultService.message;
+            if (resultService.statusCode === 500) {
+                req.logger.error(response.message);
+            } else if (resultService.statusCode === 404) {
+                req.logger.warn(response.message);
+            } else if (resultService.statusCode === 200) {
+                response.result = resultService.result;
+                req.logger.debug(response.message);
             }
-            if (responseService.status === "error") {
-                response.error = responseService.error;
-            }
-            console.log(response);
-            console.log(updatedProdInCart)
-            return response;
         } catch (error) {
-            console.error('Error:', error.message);
-            response.status = "error";
-            response.message = "Error al actualizar el producto en el carrito - Controller:" + error.message;
-            response.error = error.message;
             response.statusCode = 500;
-            return response;
-        }
-    }
+            response.message = "Error al actualizar el producto en el carrito - Controller:" + error.message;
+            req.logger.error(response.message);
+        };
+        return response;
+    };
 
-}
+};

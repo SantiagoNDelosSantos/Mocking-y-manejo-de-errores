@@ -19,9 +19,6 @@ export default class MessageService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al crear el mensaje - Service: resultDao.result es null.";
             } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
                 response.message = "Mensaje creado exitosamente.";
@@ -33,7 +30,7 @@ export default class MessageService {
         };
         return response;
     };
-    
+
     // Traer todos los mensajes - Service: 
     async getAllMessageService() {
         let response = {};
@@ -42,11 +39,8 @@ export default class MessageService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al obtener los mensajes - Service: resultDao.result es null.";
-            } else if (resultDAO.result.length === 0) {
-                 response.statusCode = 404;
+            } else if (resultDAO.status === "not found messages") {
+                response.statusCode = 404;
                 response.message = `No se encontraron mensajes. El resultado fue de ${resultDAO.result.length} mensajes`;
             } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
@@ -68,10 +62,7 @@ export default class MessageService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al eliminar el mensaje - Service: resultDao.result es null.";
-            } else if (resultDAO.result.deletedCount === 0) {
+            } else if (resultDAO.status === "not found message") {
                 response.statusCode = 404;
                 response.message = `No se encontró ningún mensaje con el ID ${mid}.`;
             } else if (resultDAO.status === "success") {

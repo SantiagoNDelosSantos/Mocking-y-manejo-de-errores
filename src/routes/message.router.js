@@ -17,7 +17,7 @@ const msmRouter = Router();
 let messageController = new MessageController();
 
 // Crear un mensaje - Router:
-msmRouter.post('/', /* passport.authenticate('jwt', {session: false}), rolesMiddlewareUser, */ async (req, res, next) => {
+msmRouter.post('/', passport.authenticate('jwt', {session: false}), rolesMiddlewareUser, async (req, res, next) => {
     const result = await messageController.createMessageController(req, res, next);
     if(result !== undefined) {
         res.status(result.statusCode).send(result);

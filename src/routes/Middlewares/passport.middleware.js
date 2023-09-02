@@ -124,7 +124,6 @@ export const authenticateWithGitHub = (req, res, next) => {
             });
         } else if (user) {
             const userSemiCompleto = await createBDUserGH(req, res, user, next);
-            console.log(userSemiCompleto)
             if (userSemiCompleto.password === "Sin contraseña.") {
                 // Cookie con el ID del usuario creado mediante GitHub para que el formulario extra pueda acceder al usuario en la base de datos y actualizarlo con los datos complementarios, antes de crear el token de jwt: 
                 res.cookie(envCoderUserIDCookie, userSemiCompleto._id, {

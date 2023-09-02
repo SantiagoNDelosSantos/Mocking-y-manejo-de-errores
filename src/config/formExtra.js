@@ -21,8 +21,6 @@ export const completeProfile = async (req, res) => {
     // Obtenemos la cookie con el ID del usuario base creado con los datos de GitHub: 
     const userId = req.signedCookies.IdentifierGitH; 
 
-    console.log('Valor de la cookie userId:', userId);
-
     const last_name = req.body.last_name;
     const email = req.body.email;
     const age = req.body.age;

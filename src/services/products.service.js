@@ -19,9 +19,6 @@ export default class ProductService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al crear el producto - Service: resultDao.result es null.";
             } else if (resultDAO.status === "success") {
                 response.statusCode = 200;
                 response.message = "Producto creado exitosamente.";
@@ -42,7 +39,7 @@ export default class ProductService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
+            } else if (resultDAO.status === "not found product") {
                 response.statusCode = 404;
                 response.message = `No se encontro ningún producto con el ID ${pid}.`;
             } else if (resultDAO.status === "success") {
@@ -65,10 +62,7 @@ export default class ProductService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result.products === null) {
-                response.statusCode = 500;
-                response.message = "Error al obtener los productos - Service: resultDao.result.products es null.";
-            } else if (resultDAO.result.products.docs.length === 0) {
+            } else if (resultDAO.status === "not found products") {
                 response.statusCode = 404;
                 response.message = `No se encontraron productos. El resultado fue de ${resultDAO.result.products.docs.length} productos.`;
             } else if (resultDAO.status === "success") {
@@ -92,10 +86,7 @@ export default class ProductService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al eliminar el producto - Service: resultDao.result es null.";
-            } else if (resultDAO.result.deletedCount === 0) {
+            } else if (resultDAO.status === "not found product") {
                 response.statusCode = 404;
                 response.message = `No se encontró ningún producto con el ID ${pid}.`;
             } else if (resultDAO.status === "success") {
@@ -118,10 +109,7 @@ export default class ProductService {
             if (resultDAO.status === "error") {
                 response.statusCode = 500;
                 response.message = resultDAO.message;
-            } else if (resultDAO.result === null) {
-                response.statusCode = 500;
-                response.message = "Error al actualizar el producto - Service: resultDao.result es null.";
-            } else if (resultDAO.result.matchedCount === 0) {
+            } else if (resultDAO.status === "not found product") {
                 response.statusCode = 404;
                 response.message = `No se encontró ningún producto con el ID ${pid}.`;
             } else if (resultDAO.status === "success") {

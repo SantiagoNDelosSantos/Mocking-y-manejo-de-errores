@@ -31,8 +31,8 @@ export default class ErrorGenerator {
         return `No se proporcionó ningún cuerpo products[{product}] para actualizar el carrito. Se recibió ${updateCartFields}`
     }
 
-    static generateUpdatesProdInCartErrorInfo(updatedProdInCart) {
-        return `No se proporcionó ningún cuerpo para actualizar el producto en carrito. Se recibió ${updatedProdInCart}`
+    static generateUpdatesProdInCartErrorInfo(quantity) {
+        return `No se proporcionó valor para actualizar el producto en carrito. Se recibió ${quantity}`
     }
 
     // Productos:

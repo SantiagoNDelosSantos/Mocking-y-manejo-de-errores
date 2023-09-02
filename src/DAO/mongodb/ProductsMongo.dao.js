@@ -2,10 +2,14 @@
 import mongoose from "mongoose";
 
 // Import del modelo de productos:
-import { productsModel } from "./models/products.model.js";
+import {
+    productsModel
+} from "./models/products.model.js";
 
 // Importación de variables de entorno:
-import { envMongoURL } from "../../config.js";
+import {
+    envMongoURL
+} from "../../config.js";
 
 // Clase para el DAO de productos:
 export default class ProductsDAO {
@@ -31,11 +35,13 @@ export default class ProductsDAO {
     async getProductById(pid) {
         let response = {};
         try {
-            const result = await productsModel.findOne({
-                _id: pid
-            });
-            response.status = "success";
-            response.result = result;
+            const result = await productsModel.findOne({ _id: pid });
+            if (result === null) {
+                response.status = "not found product";
+            } else {
+                response.status = "success";
+                response.result = result;
+            };
         } catch (error) {
             response.status = "error";
             response.message = "Error al obtener el producto por ID - DAO: " + error.message;
@@ -69,10 +75,14 @@ export default class ProductsDAO {
                 });
             }
             const hasNextPage = result.page < result.totalPages;
-            response.status = "success";
-            response.result = {
-                products: result,
-                hasNextPage: hasNextPage
+            if (result.docs.length === 0) {
+                response.status = "not found products";
+            } else {
+                response.status = "success";
+                response.result = {
+                    products: result,
+                    hasNextPage: hasNextPage
+                };
             };
         } catch (error) {
             response.status = "error";
@@ -80,16 +90,20 @@ export default class ProductsDAO {
         };
         return response;
     };
-    
+
     // Eliminar un producto por su ID - DAO:
     async deleteProduct(pid) {
         let response = {};
         try {
             let result = await productsModel.deleteOne({
                 _id: pid
-            })
-            response.status = "success";
-            response.result = result;
+            });
+            if (result.deletedCount === 0) {
+                response.status = "not found product";
+            } else if (result.deletedCount === 1) {
+                response.status = "success";
+                response.result = result;
+            };
         } catch (error) {
             response.status = "error";
             response.message = "Error al eliminar el producto - DAO: " + error.message;
@@ -101,9 +115,17 @@ export default class ProductsDAO {
     async updateProduct(pid, updateProduct) {
         let response = {};
         try {
-            let result = await productsModel.updateOne({  _id: pid }, { $set: updateProduct });
-            response.status = "success";
-            response.result = result;
+            let result = await productsModel.updateOne({
+                _id: pid
+            }, {
+                $set: updateProduct
+            });
+            if (result.matchedCount === 0) {
+                response.status = "not found product";
+            } else if (result.matchedCount === 1) {
+                response.status = "success";
+                response.result = result;
+            };
         } catch (error) {
             response.status = "error";
             response.message = "Error al actualizar el producto - DAO: " + error.message;
