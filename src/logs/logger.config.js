@@ -12,7 +12,7 @@ const devLogger = winston.createLogger({
             winston.format.colorize({colors: customLevels.colors}), 
             winston.format.simple())
     })]
-})
+});
 
 const prodLogger = winston.createLogger({
     levels: customLevels.levels,
@@ -30,10 +30,10 @@ const prodLogger = winston.createLogger({
                 winston.format.simple()
         })
     ]
-})
+});
 
 export const addLogger = (req, res, next) => {
     req.logger = envEntorno === 'PRODUCTION' ? prodLogger : devLogger;
     req.logger.http(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`);
     next();
-}
+};
