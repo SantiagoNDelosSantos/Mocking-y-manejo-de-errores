@@ -111,20 +111,16 @@ export default class CartsDAO {
 
     // Agregar un ticket a un carrito - DAO:
     async addTicketToCart(cid, ticketID) {
+        let response = {};
         try {
             const cart = await this.getCartById(cid);
             if (cart.result === null) {
                 response.status = "not found cart";
             } else {
-                const existingTicket = cart.result.tickets.findIndex(t => t.ticketsRef.toString() === ticketID);
-                if (existingTicket === -1) {
-                    cart.tickets.push({
-                        ticketsRef: ticketID
-                    });
-                    await cart.result.save();
-                    response.status = "success";
-                    response.result = cart;
-                };
+                cart.result.tickets.push({ ticketsRef: ticketID });
+                await cart.result.save();
+                response.status = "success";
+                response.result = cart;
             };
         } catch (error) {
             response.status = "error";

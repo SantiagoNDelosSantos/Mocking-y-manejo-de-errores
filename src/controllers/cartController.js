@@ -31,14 +31,14 @@ export default class CartController {
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = "Error al crear el carrito - Controller: " + error.message;
             req.logger.error(response.message);
-        }
+        };
         return response;
-    }
+    };
 
     // Traer un carrito por su ID - Controller:
     async getCartByIdController(req, res, next) {
@@ -51,10 +51,10 @@ export default class CartController {
                     message: "El ID de Carrito Proporcionado no es Válido.",
                     code: ErrorEnums.INVALID_ID_CART_ERROR
                 });
-            }
+            };
         } catch (error) {
-            return next(error)
-        }
+            return next(error);
+        };
         let response = {};
         try {
             const resultService = await this.cartService.getCartByIdService(cid);
@@ -67,14 +67,14 @@ export default class CartController {
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = 'Error al obtener el carrito por ID - Controller: ' + error.message;
             req.logger.error(response.message);
-        }
+        };
         return response;
-    }
+    };
 
 
     // Traer todos los carritos - Controller: 
@@ -91,14 +91,14 @@ export default class CartController {
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = 'Error al obtener los carritos - Controller: ' + error.message;
             req.logger.error(response.message);
-        }
+        };
         return response;
-    }
+    };
 
     // Agregar un producto a un carrito - Controller:
     async addProductInCartController(req, res, next) {
@@ -122,7 +122,7 @@ export default class CartController {
                 });
             };
         } catch (error) {
-            return next(error)
+            return next(error);
         };
         let response = {};
         try {
@@ -145,21 +145,6 @@ export default class CartController {
         return response;
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Procesamiento de la compra del usuario:
     async purchaseProductsInCartController(req, res, next) {
         const cid = req.params.cid;
@@ -174,15 +159,14 @@ export default class CartController {
                     message: "El ID de carrito proporcionado no es válido.",
                     code: ErrorEnums.INVALID_ID_CART_ERROR
                 });
-            }
-            if (!purchaseInfo || !Array.isArray(products) || products.length === 0) {
+            } else if (!purchaseInfo || !Array.isArray(products) || products.length === 0) {
                 CustomError.createError({
                     name: "Error al Procesar la Compra de Productos en el Carrito.",
                     cause: ErrorGenerator.generatePurchaseErrorInfo(purchaseInfo),
                     message: "Información de productos inválida o faltante.",
                     code: ErrorEnums.PRODUCTS_MISSING_OR_INVALID,
                 });
-            }
+            };
             for (const productInfo of products) {
                 if (!productInfo.databaseProductID || !mongoose.Types.ObjectId.isValid(productInfo.databaseProductID) || !productInfo.cartProductID || !mongoose.Types.ObjectId.isValid(productInfo.cartProductID)) {
                     const error = CustomError.createError({
@@ -192,8 +176,8 @@ export default class CartController {
                         code: ErrorEnums.INVALID_PRODUCT,
                     });
                     return next(error);
-                }
-            }
+                };
+            };
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!userEmail || !emailRegex.test(userEmail)) {
                 CustomError.createError({
@@ -202,10 +186,10 @@ export default class CartController {
                     message: "Correo electrónico inválido.",
                     code: ErrorEnums.INVALID_EMAIL,
                 })
-            }
+            };
         } catch (error) {
-            return next(error)
-        }
+            return next(error);
+        };
         let response = {};
         try {
             const resultService = await this.cartService.purchaseProductsInCartService(cid, purchaseInfo, userEmail);
@@ -218,39 +202,14 @@ export default class CartController {
                 req.logger.debug(response.message);
             } else if (resultService.statusCode === 500) {
                 req.logger.error(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = "Error al procesar la compra - Controller: " + error.message;
             req.logger.error(response.message);
-        }
+        };
         return response;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    };
 
     // Eliminar un producto de un carrito - Controller:
     async deleteProductFromCartController(req, res, next) {
@@ -264,10 +223,10 @@ export default class CartController {
                     message: "El ID de carrito o de producto no tiene un formato válido.",
                     code: ErrorEnums.INVALID_ID_CART_OR_PRODUCT_ERROR,
                 });
-            }
+            };
         } catch (error) {
-            return next(error)
-        }
+            return next(error);
+        };
         let response = {};
         try {
             const resultService = await this.cartService.deleteProductFromCartService(cid, pid);
@@ -280,7 +239,7 @@ export default class CartController {
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = "Error al eliminar producto del carrito - Controller: " + error.message;
@@ -302,7 +261,7 @@ export default class CartController {
                 });
             };
         } catch (error) {
-            return next(error)
+            return next(error);
         };
         let response = {};
         try {
@@ -344,10 +303,10 @@ export default class CartController {
                     message: "No se proporcionó ningún cuerpo para el carrito.",
                     code: ErrorEnums.INVALID_UPDATED_CART_FIELDS
                 })
-            }
+            };
         } catch (error) {
-            return next(error)
-        }
+            return next(error);
+        };
         let response = {};
         try {
             const resultService = await this.cartService.updateCartService(cid, updatedCartFields);
@@ -360,7 +319,7 @@ export default class CartController {
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = "Error al actualizar el carrito - Controller: " + error.message;
@@ -389,10 +348,10 @@ export default class CartController {
                     message: "No se proporcionó ningún quantity para el producto en carrito.",
                     code: ErrorEnums.INVALID_UPTATED_PROD_IN_CART
                 })
-            }
+            };
         } catch (error) {
-            return next(error)
-        }
+            return next(error);
+        };
         let response = {};
         try {
             const resultService = await this.cartService.updateProductInCartService(cid, pid, quantity);
@@ -405,7 +364,7 @@ export default class CartController {
             } else if (resultService.statusCode === 200) {
                 response.result = resultService.result;
                 req.logger.debug(response.message);
-            }
+            };
         } catch (error) {
             response.statusCode = 500;
             response.message = "Error al actualizar el producto en el carrito - Controller:" + error.message;

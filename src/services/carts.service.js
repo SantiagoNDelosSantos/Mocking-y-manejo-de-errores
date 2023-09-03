@@ -117,62 +117,60 @@ export default class CartService {
 
     // Procesamiento de la compra del usuario:
     async purchaseProductsInCartService(cartID, purchaseInfo, userEmail) {
+
         let response = {};
 
         try {
+
+            // Creamos un arreglo para los productos que se pueden comprar y aquellos que nos, al igual que una variable para para guardar el valor total de la compra: 
             const successfulProducts = [];
             const failedProducts = [];
             let totalAmount = 0;
 
+            // Separamos los productos que se pueden comprar de aquellos que no y calculamos el total de la compra: 
             for (const productInfo of purchaseInfo.products) {
-
-                const databaseProductID = productInfo.databaseProductID; // Obtener el _id del producto en la base de datos
+                // Obtener el _id del producto en la base de datos:
+                const databaseProductID = productInfo.databaseProductID;
+                // Obtener la cantidad que se desea comprar de ese producto: 
                 const quantityToPurchase = productInfo.quantity;
-
-                // Obtener el producto por su ID en la base de datos
+                // Obtenemos cada producto por su ID en la base de datos
                 const productFromDB = await this.productService.getProductByIdService(databaseProductID);
-
-                // Agregar al array de productos fallidos (No encontrados):
-                if (!productFromDB) {
+                // Se agrega al array de productos fallidos, los productos no encontrados y aquellos en que el productService haya devuelto error:   
+                if (productFromDB.statusCode === 404 || productFromDB.statusCode === 500) {
                     failedProducts.push(productInfo);
                     continue;
                 }
-
-                // Agregar al array de productos fallidos (Stock menor al quantity):
-                if (productFromDB.result.stock < quantityToPurchase) {
+                // Se agrega al array de productos fallidos, aquellos cuyo stock sea menor al quantity que se desea comprar:
+                else if (productFromDB.result.stock < quantityToPurchase) {
                     failedProducts.push(productInfo);
                     continue;
                 }
-
-                if (productFromDB.result.stock >= quantityToPurchase) {
+                // Si el stock del producto es mayor o igual al quantity que se desea comprar, se agrega al agreglo de productos que sí se pueden comprar (El frontend no permite selecionar menos de 1 Und. como quantity): 
+                else if (productFromDB.result.stock >= quantityToPurchase) {
                     successfulProducts.push(productInfo);
                     totalAmount += productFromDB.result.price * quantityToPurchase;
                     continue;
-                }
-
-            }
+                };
+            };
 
             for (const productInfo of successfulProducts) {
-                const databaseProductID = productInfo.databaseProductID; // Obtener el _id del producto en la base de datos
+                // Obtenemos el _id del producto en la base de datos:
+                const databaseProductID = productInfo.databaseProductID;
+                // Extraemos la cantidad a comprar de ese producto:     
                 const quantityToPurchase = productInfo.quantity;
-
-                // Obtener el producto por su ID en la base de datos
+                // Buscamos el producto por su ID en la base de datos:
                 const productFromDB = await this.productService.getProductByIdService(databaseProductID);
-
-                // Actualizar el stock del producto
+                // Restamos del stock del producto la cantidad comprada:
                 const updatedProduct = {
                     stock: productFromDB.result.stock - quantityToPurchase
                 };
-
+                // Enviamos el nuevo stock al productService, para actualizar el stock del producto: 
                 await this.productService.updateProductService(databaseProductID, updatedProduct);
-
-                // Eliminar el producto del carrito usando el cartProductID
+                // Eliminamos del carrito los productos que se pudieron comprar usando el ID que tiene el producto en el carrito:
                 await this.deleteProductFromCartService(cartID, productInfo.cartProductID);
-            }
+            };
 
-
-
-            // Crear el ticket con todos los productos de la compra después de verificar y actualizar el stock
+            // Creamos la estructura del ticket con todos los productos de la compra, tanto comprados como aquellos fallidos: 
             const ticketInfo = {
                 successfulProducts: successfulProducts.map(productInfo => ({
                     product: productInfo.databaseProductID,
@@ -189,49 +187,36 @@ export default class CartService {
                 purchase: userEmail,
                 amount: totalAmount
             };
-
+            // Enviamos la estructura al ticketService para crear al el tickect: 
             const ticketServiceResponse = await this.ticketService.createTicketService(ticketInfo);
-
-            if (ticketServiceResponse.status == "error") {
-                response.status = 'error';
-                response.message = 'Error al crear el ticket para la compra.';
-                response.error = ticketServiceResponse.error;
+            // Si hay un error en la creación del ticket lo devolvemos: 
+            if (ticketServiceResponse.statusCode === 500) {
                 response.statusCode = 500;
-                return response;
+                response.message = 'Error al crear el ticket para la compra. ' + ticketServiceResponse.message;
             }
-
-            const ticketID = ticketServiceResponse.result._id; // Obtener el ID del ticket
-            const addTicketResponse = await this.addTicketToCartService(cartID, ticketID);
-
-            if (addTicketResponse.status === 'error') {
-                response.status = 'error';
-                response.message = `No se pudo agregar el ticket al carrito con el ID ${cartID}.`;
-                response.statusCode = 500;
-                return response;
-            }
-            if (addTicketResponse.status === 'success') {
-                response.status = 'success';
-                response.message = 'Compra procesada exitosamente.';
-                response.result = ticketServiceResponse.result;
-                response.statusCode = 200;
-                return response;
-            }
-
+            // Si el ticket se crea correctamente, continuamos: 
+            else if (ticketServiceResponse.statusCode === 200) {
+                // Obtenemos el ID del ticket:
+                const ticketID = ticketServiceResponse.result._id;
+                // Enviamos el ID del carrito y el ID el ticket para agregar el ticket al carrito:
+                const addTicketResponse = await this.addTicketToCartService(cartID, ticketID);
+                // Validamos si se encontro el carrito o si hubo algun error en el proceso: 
+                if (addTicketResponse.statusCode === 404 || addTicketResponse.statusCode === 500) {
+                    response.statusCode = 500;
+                    response.message = `No se pudo agregar el ticket al carrito con el ID ${cartID}. ` + addTicketResponse.message;
+                    return response;
+                } else if (addTicketResponse.statusCode === 200) {
+                    response.statusCode = 200;
+                    response.message = 'Compra procesada exitosamente.';
+                    response.result = ticketServiceResponse.result;
+                };
+            };
         } catch (error) {
-            response.status = 'error';
-            response.message = 'Error al procesar la compra - Service: ' + error.message;
-            response.error = error.message;
             response.statusCode = 500;
-            return response;
-        }
-    }
-
-
-
-
-
-
-
+            response.message = 'Error al procesar la compra - Service: ' + error.message;
+        };
+        return response;
+    };
 
     // Agregar un ticket a un carrito - Service:
     async addTicketToCartService(cartID, ticketID) {
