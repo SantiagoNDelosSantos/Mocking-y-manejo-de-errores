@@ -47,19 +47,6 @@ cartRouter.post('/:cid/products/:pid/quantity/:quantity', passport.authenticate(
     };
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Procesamiento de la compra del usuario: 
 cartRouter.post('/:cid/purchase', async (req, res, next) => {
     const result = await cartController.purchaseProductsInCartController(req, res, next);
@@ -67,28 +54,6 @@ cartRouter.post('/:cid/purchase', async (req, res, next) => {
         res.status(result.statusCode).send(result);
     };
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Eliminar un producto de un carrito - Router:
 cartRouter.delete('/:cid/products/:pid', async (req, res, next) => {
